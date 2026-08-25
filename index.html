@@ -12,7 +12,7 @@
     <meta name="theme-color" content="#2c1804">
     <meta name="application-name" content="OfficeBreak">
     
-    <title>OfficeBreak - 1km 회사원 커피챗 플랫폼</title>
+    <title>OfficeBreak - 10분내로 회사원 커피챗 플랫폼</title>
     
     <!-- Dynamic Inline Web App Manifest for Android PWA / APK Conversion -->
     <link rel="manifest" id="manifestPlaceholder">
@@ -155,11 +155,10 @@
 
             <!-- Right: Hub Selector & Notifications -->
             <div class="flex items-center space-x-1.5 sm:space-x-2.5 flex-shrink-0">
-                <!-- Location Hub Selector (PRO Restricted) -->
+                <!-- Location Hub Selector -->
                 <div class="relative flex items-center gap-0.5 sm:gap-1 bg-stone-100 border border-stone-300 rounded-xl px-1.5 sm:px-2 py-0.5">
-                    <span class="text-[8px] sm:text-[9px] bg-amber-500 text-white font-black px-1 sm:px-1.5 py-0.2 rounded-full shadow-2xs">👑 PRO</span>
                     <select id="hubSelector" onchange="changeBusinessHub(this.value)" class="bg-transparent text-stone-700 text-[11px] sm:text-xs rounded-xl focus:outline-none block p-1 font-bold cursor-pointer max-w-[110px] sm:max-w-none truncate">
-                        <option value="samseong">📍 삼성역 / 코엑스</option>
+                        <option value="samseong" selected>📍 삼성역 / 코엑스</option>
                         <option value="pangyo">📍 판교 테크노밸리 (PRO)</option>
                         <option value="gangnam">📍 강남역 / 테헤란로 (PRO)</option>
                         <option value="yeouido">📍 여의도 금융타운 (PRO)</option>
@@ -171,14 +170,14 @@
                 <div class="relative">
                     <button onclick="toggleNotificationDropdown()" class="relative p-1.5 sm:p-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl transition cursor-pointer border border-stone-200">
                         <i class="fa-solid fa-bell text-sm sm:text-base"></i>
-                        <span id="notifBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] sm:text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center border-2 border-white">2</span>
+                        <span id="notifBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] sm:text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center border-2 border-white">1</span>
                     </button>
                     
                     <!-- Notification Dropdown -->
                     <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-stone-200 p-3 z-50 text-xs space-y-2">
                         <div class="flex justify-between items-center border-b border-stone-100 pb-2">
                             <span class="font-bold text-stone-800 flex items-center gap-1.5"><i class="fa-solid fa-bell text-amber-500"></i> 받은 커피챗 알림</span>
-                            <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-semibold" id="notifCountText">미확인 2건</span>
+                            <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-semibold" id="notifCountText">미확인 1건</span>
                         </div>
                         <div id="notifItemsContainer" class="space-y-2 max-h-60 overflow-y-auto">
                             <!-- Populated dynamically -->
@@ -254,7 +253,7 @@
                 <div class="bg-white p-2.5 rounded-xl text-xs text-stone-600 space-y-1 border border-stone-200">
                     <div class="flex justify-between">
                         <span>등록 위치:</span>
-                        <span id="myOfficeLoc" class="font-semibold text-stone-800">판교 H 스퀘어 N동</span>
+                        <span id="myOfficeLoc" class="font-semibold text-stone-800">삼성역 파르나스타워</span>
                     </div>
                     <div class="flex justify-between">
                         <span>인증 도메인:</span>
@@ -288,7 +287,7 @@
                         <i class="fa-solid fa-radar text-coffee-600 text-base"></i>
                         <span>1km 레이더 (십분내 탐색)</span>
                     </div>
-                    <span id="nearbyPeerCount" class="bg-coffee-100 text-coffee-800 text-[10px] px-2 py-0.5 rounded-full font-extrabold">4명</span>
+                    <span id="nearbyPeerCount" class="bg-coffee-100 text-coffee-800 text-[10px] px-2 py-0.5 rounded-full font-extrabold">3명</span>
                 </button>
 
                 <button onclick="switchTab('chats')" id="nav-chats" class="tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-medium text-xs text-stone-700 hover:bg-stone-100 transition cursor-pointer">
@@ -296,7 +295,7 @@
                         <i class="fa-solid fa-comments text-stone-500 text-base"></i>
                         <span>커피챗 현황 및 메세지</span>
                     </div>
-                    <span id="chatBadge" class="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">2</span>
+                    <span id="chatBadge" class="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">1</span>
                 </button>
 
                 <button onclick="switchTab('ranking')" id="nav-ranking" class="tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-medium text-xs text-stone-700 hover:bg-stone-100 transition cursor-pointer">
@@ -445,7 +444,7 @@
 
                     <div class="flex items-center bg-stone-100 p-1 rounded-xl text-xs font-bold gap-1 self-start sm:self-auto">
                         <button onclick="switchReqSubTab('received')" id="subtab-received" class="px-3 py-1.5 rounded-lg bg-white text-stone-800 shadow-2xs transition cursor-pointer">
-                            📥 받은 신청 (<span id="incomingRequestsCount">2</span>)
+                            📥 받은 신청 (<span id="incomingRequestsCount">1</span>)
                         </button>
                         <button onclick="switchReqSubTab('sent')" id="subtab-sent" class="px-3 py-1.5 rounded-lg text-stone-500 hover:text-stone-800 transition cursor-pointer">
                             📤 내가 보낸 신청 (<span id="sentRequestsCount">1</span>)
@@ -556,7 +555,7 @@
                     </div>
                     <h2 class="text-xl font-extrabold tracking-tight flex items-center gap-2">
                         <i class="fa-solid fa-crown text-amber-400"></i>
-                        <span id="rankingHubTitle">판교 테크노밸리</span> 지역 직장인 인기도 랭킹
+                        <span id="rankingHubTitle">삼성역 / 코엑스</span> 지역 직장인 인기도 랭킹
                     </h2>
                     <p class="text-xs text-stone-300">
                         커피챗을 수락할 때마다 인기도가 상승하며, 지역 내 검증된 네트워킹 인사이더로 추천됩니다.
@@ -666,7 +665,7 @@
 
             <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
                 <h3 class="font-bold text-stone-800 text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-clock-rotate-left text-coffee-600"></i> 최근 1개월 생생 후기 (<span id="totalReviewsCount">3</span>건)
+                    <i class="fa-solid fa-clock-rotate-left text-coffee-600"></i> 최근 1개월 생생 후기 (<span id="totalReviewsCount">1</span>건)
                 </h3>
                 <div id="reviewsFeedContainer" class="space-y-3"></div>
             </div>
@@ -842,7 +841,7 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-stone-700 mb-1">사무실 위치</label>
-                    <input type="text" id="officeLocInput" value="판교 H 스퀘어 N동" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-medium">
+                    <input type="text" id="officeLocInput" value="삼성역 파르나스타워" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-medium">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-stone-700 mb-1">직무 / 담당 업무</label>
@@ -939,11 +938,11 @@
                 </div>
                 <div>
                     <label class="font-semibold block mb-1">상대방 정보</label>
-                    <div id="reviewPeerNameDisplay" class="w-full bg-stone-100 border border-stone-200 p-2.5 rounded-xl font-bold text-stone-800"></div>
+                    <div id="reviewPeerNameDisplay" class="w-full bg-stone-100 border border-stone-200 p-2.5 rounded-xl font-bold text-stone-800">선택한 커피챗 없음</div>
                 </div>
                 <div>
                     <label class="font-semibold block mb-1">만난 장소</label>
-                    <input type="text" id="reviewPlaceInput" value="스타벅스 판교H스퀘어점" class="w-full bg-stone-50 border p-2.5 rounded-xl font-medium">
+                    <input type="text" id="reviewPlaceInput" value="스타벅스 삼성역점" class="w-full bg-stone-50 border p-2.5 rounded-xl font-medium">
                 </div>
                 <div>
                     <label class="font-semibold block mb-1">만족도 별점</label>
@@ -1089,7 +1088,7 @@
 
             <div class="space-y-1.5">
                 <label class="block text-xs font-bold text-stone-700">활동 닉네임 설정</label>
-                <input type="text" id="settingNicknameInput" placeholder="예: 판교기획자, 서연프로" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                <input type="text" id="settingNicknameInput" placeholder="예: 삼성동기획자, 서연프로" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none">
             </div>
 
             <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 space-y-1.5">
@@ -1134,8 +1133,6 @@
         let tempAvatarDataUrl = null;
         let isSidebarOpen = false;
         let androidDeferredPrompt = null;
-
-        // ... existing manifest & service worker code ...
 
         // Business Hub Configs
         const hubConfigs = {
@@ -1260,7 +1257,7 @@
                 senderName: "박준혁 프로",
                 company: "네이버",
                 role: "프론트엔드 개발자",
-                cafe: "스타벅스 판교H스퀘어점",
+                cafe: "스타벅스 삼성역점",
                 time: "오늘 12:15",
                 topic: "직무/커리어",
                 message: "안녕하세요 서연님! 카카오 PO 직무와 서비스 기획 노하우 공유받고 싶습니다.",
@@ -1278,11 +1275,11 @@
                 peerCompany: "토스",
                 peerRole: "브랜드 마케터",
                 avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-                cafe: "스타벅스 판교H스퀘어점",
+                cafe: "스타벅스 코엑스몰점",
                 time: "오늘 12:15",
                 isCompleted: false,
                 messages: [
-                    { id: 1, sender: "peer", text: "안녕하세요 서연 프로님! 오늘 12:15 스타벅스 H스퀘어점 맞으시죠?", time: "오전 11:30" },
+                    { id: 1, sender: "peer", text: "안녕하세요 서연 프로님! 오늘 12:15 스타벅스 코엑스점 맞으시죠?", time: "오전 11:30" },
                     { id: 2, sender: "me", text: "네 민지님! 1층 창가 좌석 근처에서 뵙겠습니다. 기대되네요!", time: "오전 11:32" }
                 ]
             }
@@ -1299,7 +1296,7 @@
                 peerName: "박준혁 프로",
                 peerCompany: "네이버",
                 peerRole: "개발자",
-                place: "스타벅스 판교H스퀘어점",
+                place: "스타벅스 삼성역점",
                 rating: 5,
                 comment: "도보 5분 거리라 점심시간에 부담 없이 만나 커피 한 잔했습니다. 대용량 데이터 처리 노하우를 명쾌하게 설명해주셔서 큰 도움이 되었습니다!",
                 date: "2일 전"
@@ -1316,7 +1313,6 @@
                 sidebar.classList.remove('closed');
                 sidebar.classList.add('open');
                 backdrop.classList.remove('hidden');
-                history.pushState({ menu: true }, '');
             } else {
                 sidebar.classList.remove('open');
                 sidebar.classList.add('closed');
@@ -1326,6 +1322,44 @@
             if (leafletMap) {
                 setTimeout(() => leafletMap.invalidateSize(), 300);
             }
+        }
+
+        function toggleNotificationDropdown() {
+            const dropdown = document.getElementById('notifDropdown');
+            if (!dropdown) return;
+            dropdown.classList.toggle('hidden');
+            renderNotificationItems();
+        }
+
+        function renderNotificationItems() {
+            const container = document.getElementById('notifItemsContainer');
+            if (!container) return;
+            
+            if (incomingRequests.length === 0) {
+                container.innerHTML = `<div class="text-center py-4 text-stone-400 text-xs">도착한 커피챗 신청이 없습니다.</div>`;
+                document.getElementById('notifBadge').innerText = "0";
+                document.getElementById('notifCountText').innerText = "미확인 0건";
+                return;
+            }
+
+            document.getElementById('notifBadge').innerText = incomingRequests.length.toString();
+            document.getElementById('notifCountText').innerText = `미확인 ${incomingRequests.length}건`;
+
+            container.innerHTML = incomingRequests.map(req => `
+                <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <img src="${req.avatar}" class="w-8 h-8 rounded-full object-cover flex-shrink-0 border">
+                        <div class="truncate">
+                            <p class="font-bold text-stone-800 truncate">${req.senderName} (${req.company})</p>
+                            <p class="text-[10px] text-stone-500 truncate">${req.topic} • ${req.time}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-1 flex-shrink-0">
+                        <button onclick="acceptRequest(${req.id})" class="bg-emerald-600 text-white text-[10px] px-2 py-1 rounded-lg font-bold">수락</button>
+                        <button onclick="rejectRequest(${req.id})" class="bg-stone-200 text-stone-700 text-[10px] px-2 py-1 rounded-lg">거절</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function switchTab(tabName) {
@@ -1344,6 +1378,12 @@
 
             if (tabName === 'ranking') {
                 renderPopularityRanking();
+            } else if (tabName === 'chats') {
+                renderReceivedRequests();
+                renderSentRequests();
+                renderChatList();
+            } else if (tabName === 'reviews') {
+                renderReviews();
             } else if (tabName === 'radar' && leafletMap) {
                 setTimeout(() => leafletMap.invalidateSize(), 100);
             }
@@ -1484,18 +1524,753 @@
             `).join('');
         }
 
-        function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-            history.pushState({ modal: id }, '');
+        function openCoffeeChatModal(peerId) {
+            activeSelectedPeer = peerData.find(p => p.id === peerId);
+            if (!activeSelectedPeer) return;
+
+            document.getElementById('targetPeerAvatar').src = activeSelectedPeer.avatar;
+            document.getElementById('targetPeerName').innerText = activeSelectedPeer.name;
+            document.getElementById('targetPeerCompany').innerText = `${activeSelectedPeer.company} • ${activeSelectedPeer.role}`;
+
+            const cafeSelect = document.getElementById('reqCafe');
+            const currentHubCafes = hubConfigs[currentHubKey].cafes;
+            cafeSelect.innerHTML = currentHubCafes.map(cafe => `<option value="${cafe}">${cafe}</option>`).join('');
+
+            openModal('coffeeChatModal');
         }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
+        function selectTimeSlot(btn, text) {
+            document.querySelectorAll('.time-slot-btn').forEach(b => {
+                b.classList.remove('active', 'border-coffee-600', 'bg-coffee-50', 'text-coffee-800');
+                b.classList.add('border-stone-200', 'bg-stone-50', 'text-stone-700');
+            });
+            btn.classList.add('active', 'border-coffee-600', 'bg-coffee-50', 'text-coffee-800');
+            selectedTimeSlotText = text;
+        }
+
+        function generateAIMessageForModal() {
+            if (!activeSelectedPeer) return;
+            const reqTopic = document.getElementById('reqTopic').value;
+            const templates = [
+                `안녕하세요 ${activeSelectedPeer.name}님! ${activeSelectedPeer.company}의 ${activeSelectedPeer.role} 직무 경험 이야기를 나누고자 커피챗 신청합니다.`,
+                `반갑습니다 프로님! ${reqTopic} 관련하여 가볍게 커피 한 잔하며 인사이트 공유할 수 있을까요?`,
+                `안녕하세요! 삼성역 오피스 근처에 계셔서 반가운 마음에 커피챗 청합니다. 편하신 시간에 맞춰 이야기 나누고 싶습니다!`
+            ];
+            const randomIndex = Math.floor(Math.random() * templates.length);
+            document.getElementById('reqMessage').value = templates[randomIndex];
+            showToast("✨ AI 인사말 문구가 자동 생성되었습니다.");
+        }
+
+        function submitCoffeeChatRequest() {
+            if (!activeSelectedPeer) return;
+            
+            const message = document.getElementById('reqMessage').value.trim();
+            const containsForbiddenTimesOrPlaces = /(12|13|14|15|16|17|18|19|20|시|분|전화|카톡|010|스타벅스|투썸|폴바셋)/.test(message);
+
+            if (containsForbiddenTimesOrPlaces && message.length > 20) {
+                showToast("⚠️ 메시지 본문에 구체적인 장소, 시간, 연락처 표기는 금지되어 있습니다.");
+                return;
+            }
+
+            const newSentReq = {
+                id: Date.now(),
+                recipientName: activeSelectedPeer.name,
+                company: activeSelectedPeer.company,
+                role: activeSelectedPeer.role,
+                cafe: document.getElementById('reqCafe').value,
+                time: selectedTimeSlotText,
+                topic: document.getElementById('reqTopic').value,
+                message: message || "안녕하세요! 커피 한 잔 나누고 싶어 신청합니다.",
+                avatar: activeSelectedPeer.avatar,
+                sentDate: new Date(),
+                status: "대기 중"
+            };
+
+            sentRequests.push(newSentReq);
+            closeModal('coffeeChatModal');
+            showToast(`📩 ${activeSelectedPeer.name}님께 커피챗 신청이 완료되었습니다.`);
+            
+            switchTab('chats');
+            switchReqSubTab('sent');
+        }
+
+        function switchReqSubTab(subTab) {
+            currentSubReqTab = subTab;
+            const btnRec = document.getElementById('subtab-received');
+            const btnSent = document.getElementById('subtab-sent');
+            const containerRec = document.getElementById('receivedRequestsContainer');
+            const containerSent = document.getElementById('sentRequestsContainer');
+
+            if (subTab === 'received') {
+                btnRec.className = "px-3 py-1.5 rounded-lg bg-white text-stone-800 shadow-2xs transition cursor-pointer font-bold";
+                btnSent.className = "px-3 py-1.5 rounded-lg text-stone-500 hover:text-stone-800 transition cursor-pointer font-medium";
+                containerRec.classList.remove('hidden');
+                containerSent.classList.add('hidden');
+            } else {
+                btnSent.className = "px-3 py-1.5 rounded-lg bg-white text-stone-800 shadow-2xs transition cursor-pointer font-bold";
+                btnRec.className = "px-3 py-1.5 rounded-lg text-stone-500 hover:text-stone-800 transition cursor-pointer font-medium";
+                containerSent.classList.remove('hidden');
+                containerRec.classList.add('hidden');
+            }
+        }
+
+        function renderReceivedRequests() {
+            const listContainer = document.getElementById('receivedRequestsList');
+            document.getElementById('incomingRequestsCount').innerText = incomingRequests.length.toString();
+
+            if (incomingRequests.length === 0) {
+                listContainer.innerHTML = `<div class="col-span-full text-center py-8 text-stone-400 text-xs">도착한 새로운 커피챗 신청이 없습니다.</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = incomingRequests.map(req => `
+                <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200 space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <img src="${req.avatar}" class="w-10 h-10 rounded-full object-cover border">
+                        <div>
+                            <h4 class="font-bold text-stone-800 text-sm">${req.senderName}</h4>
+                            <p class="text-xs text-stone-500">${req.company} • ${req.role}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-stone-100 text-xs space-y-1">
+                        <p class="font-semibold text-coffee-800">💡 주제: ${req.topic}</p>
+                        <p class="text-stone-600 font-medium">💬 "${req.message}"</p>
+                        <p class="text-[10px] text-stone-400 blur-xs select-none">📍 ${req.cafe} (${req.time})</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="acceptRequest(${req.id})" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2 rounded-xl transition shadow-2xs cursor-pointer">
+                            수락하기 (+1P)
+                        </button>
+                        <button onclick="rejectRequest(${req.id})" class="bg-stone-200 hover:bg-stone-300 text-stone-700 font-semibold text-xs px-3 py-2 rounded-xl transition cursor-pointer">
+                            거절
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSentRequests() {
+            const listContainer = document.getElementById('sentRequestsList');
+            document.getElementById('sentRequestsCount').innerText = sentRequests.length.toString();
+
+            if (sentRequests.length === 0) {
+                listContainer.innerHTML = `<div class="col-span-full text-center py-8 text-stone-400 text-xs">내가 보낸 커피챗 신청 내역이 없습니다.</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = sentRequests.map(req => `
+                <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <img src="${req.avatar}" class="w-10 h-10 rounded-full object-cover border">
+                            <div>
+                                <h4 class="font-bold text-stone-800 text-sm">${req.recipientName}</h4>
+                                <p class="text-xs text-stone-500">${req.company} • ${req.role}</p>
+                            </div>
+                        </div>
+                        <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${req.status}</span>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-xl border border-stone-100 text-xs">
+                        <p class="text-stone-700 font-medium line-clamp-2">💬 "${req.message}"</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function acceptRequest(reqId) {
+            const reqIndex = incomingRequests.findIndex(r => r.id === reqId);
+            if (reqIndex === -1) return;
+
+            const req = incomingRequests[reqIndex];
+            incomingRequests.splice(reqIndex, 1);
+
+            // Create new active chat
+            const newChat = {
+                id: Date.now(),
+                peerName: req.senderName,
+                peerCompany: req.company,
+                peerRole: req.role,
+                avatar: req.avatar,
+                cafe: req.cafe,
+                time: req.time,
+                isCompleted: false,
+                messages: [
+                    { id: 1, sender: "peer", text: req.message, time: "방금 전" },
+                    { id: 2, sender: "me", text: "안녕하세요! 커피챗 신청 수락했습니다. 시간과 장소에 맞춰 찾아뵐게요!", time: "방금 전" }
+                ]
+            };
+
+            chatList.push(newChat);
+            currentUser.popularity += 1;
+
+            document.getElementById('sidebarPopularityScore').innerText = `${currentUser.popularity} P`;
+            document.getElementById('myPopularityDisplay').innerText = `${currentUser.popularity} P`;
+
+            renderNotificationItems();
+            renderReceivedRequests();
+            renderChatList();
+            selectChatRoom(newChat.id);
+
+            showToast(`🎉 커피챗 신청을 수락했습니다! 인기도 +1 P 상승 (총 ${currentUser.popularity} P)`);
+        }
+
+        function rejectRequest(reqId) {
+            const reqIndex = incomingRequests.findIndex(r => r.id === reqId);
+            if (reqIndex !== -1) {
+                incomingRequests.splice(reqIndex, 1);
+                renderNotificationItems();
+                renderReceivedRequests();
+                showToast("커피챗 신청을 정중히 거절하였습니다.");
+            }
+        }
+
+        function switchChatFilter(filterMode) {
+            currentChatFilterMode = filterMode;
+            const btnActive = document.getElementById('chatFilterActive');
+            const btnCompleted = document.getElementById('chatFilterCompleted');
+
+            if (filterMode === 'active') {
+                btnActive.className = "px-3 py-1 rounded-lg bg-white text-stone-800 shadow-2xs cursor-pointer font-bold";
+                btnCompleted.className = "px-3 py-1 rounded-lg text-stone-500 hover:text-stone-800 cursor-pointer font-medium";
+                document.getElementById('chatListHeaderTitle').innerText = "진행 중인 대화 목록";
+            } else {
+                btnCompleted.className = "px-3 py-1 rounded-lg bg-white text-stone-800 shadow-2xs cursor-pointer font-bold";
+                btnActive.className = "px-3 py-1 rounded-lg text-stone-500 hover:text-stone-800 cursor-pointer font-medium";
+                document.getElementById('chatListHeaderTitle').innerText = "지난 완료된 커피챗 목록";
+            }
+            renderChatList();
+        }
+
+        function renderChatList() {
+            const container = document.getElementById('coffeeChatList');
+            const targetList = currentChatFilterMode === 'active' ? chatList : completedChatList;
+
+            document.getElementById('totalChatCount').innerText = chatList.length.toString();
+            document.getElementById('totalCompletedChatCount').innerText = completedChatList.length.toString();
+
+            if (targetList.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-stone-400 text-xs">해당하는 대화 내역이 없습니다.</div>`;
+                return;
+            }
+
+            container.innerHTML = targetList.map(chat => `
+                <div onclick="selectChatRoom(${chat.id})" class="p-3 bg-stone-50 hover:bg-amber-50/60 rounded-xl border border-stone-200 transition cursor-pointer flex items-center justify-between ${activeChatId === chat.id ? 'ring-2 ring-coffee-600 bg-amber-50' : ''}">
+                    <div class="flex items-center space-x-3 min-w-0">
+                        <img src="${chat.avatar}" class="w-10 h-10 rounded-full object-cover border flex-shrink-0">
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-stone-800 text-xs truncate">${chat.peerName}</h4>
+                            <p class="text-[10px] text-stone-500 truncate">${chat.peerCompany} • ${chat.cafe}</p>
+                        </div>
+                    </div>
+                    ${chat.isCompleted ? '<span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">완료</span>' : ''}
+                </div>
+            `).join('');
+        }
+
+        function selectChatRoom(chatId) {
+            activeChatId = chatId;
+            const chat = [...chatList, ...completedChatList].find(c => c.id === chatId);
+            if (!chat) return;
+
+            document.getElementById('noChatSelectedState').classList.add('hidden');
+            const activeChatContent = document.getElementById('activeChatContent');
+            activeChatContent.classList.remove('hidden');
+            activeChatContent.classList.add('flex');
+
+            document.getElementById('chatPeerAvatar').src = chat.avatar;
+            document.getElementById('chatPeerName').innerText = chat.peerName;
+            document.getElementById('chatPeerCompany').innerText = chat.peerCompany;
+            document.getElementById('chatPeerDetails').innerText = chat.peerRole;
+            document.getElementById('chatMeetingTime').innerText = chat.time;
+            document.getElementById('chatMeetingPlace').innerText = chat.cafe;
+
+            const btnComplete = document.getElementById('btnCompleteChatAction');
+            if (chat.isCompleted) {
+                btnComplete.classList.add('hidden');
+            } else {
+                btnComplete.classList.remove('hidden');
+            }
+
+            renderChatList();
+            renderActiveChatMessages();
+        }
+
+        function renderActiveChatMessages() {
+            if (!activeChatId) return;
+            const chat = [...chatList, ...completedChatList].find(c => c.id === activeChatId);
+            if (!chat) return;
+
+            const box = document.getElementById('chatMessagesBox');
+            box.innerHTML = chat.messages.map(msg => {
+                const isMe = msg.sender === 'me';
+                return `
+                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                        <div class="max-w-[75%] ${isMe ? 'bg-coffee-700 text-white' : 'bg-white text-stone-800 border border-stone-200'} p-3 rounded-2xl shadow-2xs space-y-1 relative group">
+                            <p class="text-xs leading-relaxed">${msg.text}</p>
+                            <div class="flex items-center justify-between gap-2 text-[9px] ${isMe ? 'text-amber-200' : 'text-stone-400'}">
+                                <span>${msg.time}</span>
+                                ${isMe ? `
+                                    <div class="opacity-0 group-hover:opacity-100 transition space-x-1">
+                                        <button onclick="editChatMessage(${msg.id})" class="hover:underline">수정</button>
+                                        <button onclick="deleteChatMessage(${msg.id})" class="hover:underline text-red-300">삭제</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            if (!activeChatId) return;
+            const input = document.getElementById('chatInputMessage');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chat = chatList.find(c => c.id === activeChatId);
+            if (!chat) return;
+
+            chat.messages.push({
+                id: Date.now(),
+                sender: "me",
+                text: text,
+                time: "방금 전"
+            });
+
+            input.value = "";
+            renderActiveChatMessages();
+        }
+
+        function editChatMessage(msgId) {
+            const chat = chatList.find(c => c.id === activeChatId);
+            if (!chat) return;
+            const msg = chat.messages.find(m => m.id === msgId);
+            if (!msg) return;
+
+            const newText = prompt("메시지를 수정하세요:", msg.text);
+            if (newText !== null && newText.trim() !== "") {
+                msg.text = newText.trim();
+                renderActiveChatMessages();
+                showToast("메시지가 수정되었습니다.");
+            }
+        }
+
+        function deleteChatMessage(msgId) {
+            const chat = chatList.find(c => c.id === activeChatId);
+            if (!chat) return;
+            const msgIndex = chat.messages.findIndex(m => m.id === msgId);
+            if (msgIndex !== -1) {
+                chat.messages.splice(msgIndex, 1);
+                renderActiveChatMessages();
+                showToast("메시지가 삭제되었습니다.");
+            }
+        }
+
+        function markCurrentChatAsCompleted() {
+            if (!activeChatId) return;
+            const chatIndex = chatList.findIndex(c => c.id === activeChatId);
+            if (chatIndex === -1) return;
+
+            const chat = chatList[chatIndex];
+            chat.isCompleted = true;
+            chatList.splice(chatIndex, 1);
+            completedChatList.push(chat);
+
+            showToast("✅ 커피챗이 완료 처리되었습니다! 후기를 남겨주세요.");
+            switchChatFilter('completed');
+            selectChatRoom(chat.id);
+        }
+
+        async function generateChatSpecificIcebreaker() {
+            if (!activeChatId) return;
+            const chat = chatList.find(c => c.id === activeChatId);
+            if (!chat) return;
+
+            const prompt = `커피챗 상대방 정보: 이름 ${chat.peerName}, 소속 ${chat.peerCompany}, 직무 ${chat.peerRole}. 자연스러운 첫 질문 문장 1개를 짧고 친근하게 생성해줘.`;
+            
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                const data = await response.json();
+                const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (aiText) {
+                    document.getElementById('chatInputMessage').value = aiText.replace(/"/g, '').trim();
+                    showToast("✨ Gemini AI가 추천 문장을 대화창에 입력했습니다.");
+                    return;
+                }
+            } catch (e) {
+                console.log("AI API Fallback Triggered");
+            }
+
+            document.getElementById('chatInputMessage').value = `안녕하세요 ${chat.peerName}님! 최근 ${chat.peerCompany}에서 주력하시는 프로젝트 이야기를 듣고 싶습니다!`;
+            showToast("✨ 추천 대화 질문이 입력되었습니다.");
+        }
+
+        async function fetchAITopics() {
+            const btn = document.getElementById('btnGenerateAI');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Gemini 생성 중...`;
+
+            const peerInfo = document.getElementById('aiPeerSelect').value;
+            const tone = document.getElementById('aiToneSelect').value;
+
+            setTimeout(() => {
+                document.getElementById('aiPlaceholderState').classList.add('hidden');
+                const content = document.getElementById('aiOutputContent');
+                content.classList.remove('hidden');
+
+                content.innerHTML = `
+                    <div class="bg-purple-50/70 p-4 rounded-2xl border border-purple-200 space-y-2">
+                        <span class="bg-purple-200 text-purple-900 text-[10px] font-bold px-2 py-0.5 rounded">질문 카드 #1</span>
+                        <h4 class="font-bold text-purple-950 text-xs">최근 관심사와 직무 도전</h4>
+                        <p class="text-xs text-purple-800">"요즘 ${peerInfo.split('|')[1]}에서 다루시는 직무적 도전 과제나 기술 트렌드가 궁금합니다!"</p>
+                    </div>
+                    <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-200 space-y-2">
+                        <span class="bg-amber-200 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded">질문 카드 #2</span>
+                        <h4 class="font-bold text-amber-950 text-xs">커리어 성장 및 조직 문화</h4>
+                        <p class="text-xs text-amber-800">"${peerInfo.split('|')[1]}의 조직 문화나 커리어 성장을 위해 인상 깊었던 경험이 있으신가요?"</p>
+                    </div>
+                    <div class="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200 space-y-2">
+                        <span class="bg-emerald-200 text-emerald-900 text-[10px] font-bold px-2 py-0.5 rounded">질문 카드 #3</span>
+                        <h4 class="font-bold text-emerald-950 text-xs">가벼운 오피스 아이스브레이킹</h4>
+                        <p class="text-xs text-emerald-800">"근처 자주 가시는 추천 카페나 점심 맛집 공유해주실 수 있나요?"</p>
+                    </div>
+                `;
+
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-sparkles"></i> <span>주제 & 질문 생성하기</span>`;
+                showToast("✨ Gemini AI 맞춤 주제 생성이 완료되었습니다.");
+            }, 800);
+        }
+
+        function renderPopularityRanking() {
+            const container = document.getElementById('popularityLeaderboardContainer');
+            const rankingList = [...peerData, { name: currentUser.name, company: currentUser.company, role: currentUser.role, popularity: currentUser.popularity, avatar: currentUser.avatar }]
+                .sort((a, b) => b.popularity - a.popularity);
+
+            container.innerHTML = rankingList.map((peer, idx) => {
+                const rankNum = idx + 1;
+                let badgeClass = "bg-stone-100 text-stone-700";
+                if (rankNum === 1) badgeClass = "bg-amber-400 text-stone-950 font-black";
+                else if (rankNum === 2) badgeClass = "bg-stone-300 text-stone-900 font-bold";
+                else if (rankNum === 3) badgeClass = "bg-amber-700 text-white font-bold";
+
+                return `
+                    <div class="p-3 bg-stone-50 rounded-2xl border border-stone-200 flex items-center justify-between text-xs">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full ${badgeClass} flex items-center justify-center text-[10px]">${rankNum}</span>
+                            <img src="${peer.avatar}" class="w-10 h-10 rounded-full object-cover border">
+                            <div>
+                                <h4 class="font-bold text-stone-800 text-sm">${peer.name}</h4>
+                                <p class="text-[11px] text-stone-500">${peer.company} • ${peer.role}</p>
+                            </div>
+                        </div>
+                        <span class="bg-orange-100 text-orange-800 font-black px-2.5 py-1 rounded-full text-xs flex items-center gap-1">
+                            <i class="fa-solid fa-fire text-orange-500"></i> ${peer.popularity} P
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openReviewModal() {
+            const select = document.getElementById('reviewChatSelect');
+            if (completedChatList.length === 0) {
+                select.innerHTML = `<option value="">완료된 커피챗이 없습니다.</option>`;
+                document.getElementById('reviewPeerNameDisplay').innerText = "완료된 커피챗 없음";
+            } else {
+                select.innerHTML = completedChatList.map(c => `<option value="${c.id}">${c.peerName} (${c.peerCompany})</option>`).join('');
+                onSelectReviewChat(completedChatList[0].id);
+            }
+            openModal('reviewModal');
+        }
+
+        function onSelectReviewChat(chatId) {
+            const chat = completedChatList.find(c => c.id == chatId);
+            if (chat) {
+                document.getElementById('reviewPeerNameDisplay').innerText = `${chat.peerName} (${chat.peerCompany} • ${chat.peerRole})`;
+                document.getElementById('reviewPlaceInput').value = chat.cafe;
+            }
+        }
+
+        function setStarRating(star) {
+            currentSelectedStar = star;
+            const stars = document.querySelectorAll('#starRatingBox i');
+            stars.forEach((s, idx) => {
+                if (idx < star) {
+                    s.className = "fa-solid fa-star cursor-pointer text-amber-400";
+                } else {
+                    s.className = "fa-regular fa-star cursor-pointer text-stone-300";
+                }
+            });
+        }
+
+        function submitReview() {
+            const text = document.getElementById('reviewTextInput').value.trim();
+            if (!text) {
+                showToast("후기 내용을 입력해주세요.");
+                return;
+            }
+
+            const newReview = {
+                id: Date.now(),
+                isWeeklyBest: true,
+                author: currentUser.name,
+                company: currentUser.company,
+                peerName: "이민지 리드",
+                peerCompany: "토스",
+                peerRole: "마케터",
+                place: document.getElementById('reviewPlaceInput').value,
+                rating: currentSelectedStar,
+                comment: text,
+                date: "방금 전"
+            };
+
+            reviewsData.unshift(newReview);
+            closeModal('reviewModal');
+            renderReviews();
+            showToast("🏆 커피챗 후기가 작성되었습니다! 주간 시상 후보에 등록되었습니다.");
+        }
+
+        function renderReviews() {
+            const weeklyContainer = document.getElementById('weeklyBestFeedContainer');
+            const listContainer = document.getElementById('reviewsFeedContainer');
+
+            document.getElementById('totalReviewsCount').innerText = reviewsData.length.toString();
+
+            weeklyContainer.innerHTML = reviewsData.map(r => `
+                <div class="bg-amber-50/90 p-4 rounded-2xl border border-amber-200/80 space-y-2 text-xs">
+                    <div class="flex justify-between items-center">
+                        <span class="bg-amber-400 text-stone-950 font-black text-[9px] px-2 py-0.5 rounded-full">주간 Best 🏆</span>
+                        <span class="text-amber-500">${'★'.repeat(r.rating)}</span>
+                    </div>
+                    <p class="font-bold text-stone-800">${r.author} (${r.company}) ↔ ${r.peerName} (${r.peerCompany})</p>
+                    <p class="text-stone-700 italic">"${r.comment}"</p>
+                    <p class="text-[10px] text-stone-400">📍 ${r.place} • ${r.date}</p>
+                </div>
+            `).join('');
+
+            listContainer.innerHTML = reviewsData.map(r => `
+                <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 space-y-1.5 text-xs">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-stone-800">${r.author} (${r.company})</span>
+                        <span class="text-amber-400 font-bold">${'★'.repeat(r.rating)}</span>
+                    </div>
+                    <p class="text-stone-600">"${r.comment}"</p>
+                    <p class="text-[10px] text-stone-400">📍 ${r.place}</p>
+                </div>
+            `).join('');
+        }
+
+        function buyPassPackage(title, price, count) {
+            document.getElementById('playProductName').innerText = `OfficeBreak ${title} 이용권`;
+            document.getElementById('playProductPrice').innerText = `₩${price.toLocaleString()}`;
+            document.getElementById('playProductDesc').innerText = `도보 10분 내 검증된 직장인 ${count}회 커피챗 신청권`;
+            openModal('googlePlayModal');
+        }
+
+        function subscribeMembership(title, price) {
+            document.getElementById('playProductName').innerText = `OfficeBreak ${title} 멤버십`;
+            document.getElementById('playProductPrice').innerText = `₩${price.toLocaleString()}`;
+            document.getElementById('playProductDesc').innerText = `모든 거점 자유 변경 & OFF 회원 인앱 알림 신청 기능`;
+            openModal('googlePlayModal');
+        }
+
+        function processPlayPurchase() {
+            const btn = document.getElementById('btnConfirmPlayPurchase');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-sm mr-2"></i> Google Play 승인 중...`;
+
+            setTimeout(() => {
+                const orderId = `GPA.3382-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`;
+                currentUser.passes += 1;
+                document.getElementById('headerPassCount').innerHTML = `이용권 <b class="text-amber-700">${currentUser.passes}회</b>`;
+                showToast(`🛍️ [Google Play] 결제 성공! (${orderId}) 이용권이 충전되었습니다.`);
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-lock text-sm"></i> <span>1회 클릭 구매 (Google Play)</span>`;
+                closeModal('googlePlayModal');
+            }, 1000);
         }
 
         function openVerificationModal() { openModal('verificationModal'); }
         function openProfileSettingsModal() { openModal('profileSettingsModal'); }
         function openBusinessInquiryModal() { openModal('businessInquiryModal'); }
+
+        function sendVerificationEmail() {
+            const email = document.getElementById('emailInput').value.trim();
+            if (!email || !email.includes('@')) {
+                showToast("올바른 이메일 주소를 입력해주세요.");
+                return;
+            }
+
+            generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
+            document.getElementById('demoCodeDisplay').innerText = generatedCode;
+            document.getElementById('codeVerifySection').classList.remove('hidden');
+
+            timeLeft = 180;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                const secs = (timeLeft % 60).toString().padStart(2, '0');
+                document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    showToast("인증 시간이 만료되었습니다. 재발송해주세요.");
+                }
+            }, 1000);
+
+            showToast("📩 인증번호 4자리가 발송되었습니다.");
+        }
+
+        function autoFillDemoCode() {
+            if (generatedCode) {
+                document.getElementById('codeInput').value = generatedCode;
+                verifyEmailCode();
+            }
+        }
+
+        function verifyEmailCode() {
+            const code = document.getElementById('codeInput').value.trim();
+            if (code === generatedCode) {
+                isEmailCodeVerified = true;
+                if (timerInterval) clearInterval(timerInterval);
+                showToast("✅ 이메일 인증번호가 확인되었습니다.");
+            } else {
+                showToast("❌ 인증번호가 일치하지 않습니다.");
+            }
+        }
+
+        function processDomainVerification() {
+            if (!isEmailCodeVerified) {
+                showToast("이메일 인증번호 확인이 필요합니다.");
+                return;
+            }
+
+            const email = document.getElementById('emailInput').value.trim();
+            const domain = email.split('@')[1] || "kakao.com";
+            
+            currentUser.company = domain.split('.')[0].toUpperCase();
+            currentUser.domain = `@${domain}`;
+            currentUser.office = document.getElementById('officeLocInput').value;
+            currentUser.role = document.getElementById('jobRoleInput').value;
+
+            if (!currentUser.welcomePassClaimed) {
+                currentUser.passes += 1;
+                currentUser.welcomePassClaimed = true;
+                showToast("🎁 최초 인증 무료 이용권 1회가 추가 지급되었습니다!");
+            }
+
+            updateUserProfileUI();
+            closeModal('verificationModal');
+            showToast("🎉 회사 인증이 완료되었습니다.");
+        }
+
+        function authenticateWithRemember() {
+            currentUser.company = "카카오";
+            currentUser.domain = "@kakao.com";
+            currentUser.role = "서비스 기획자 / PO";
+            currentUser.verified = true;
+            updateUserProfileUI();
+            closeModal('verificationModal');
+            showToast("⚡️ 리멤버 명함 프로필로 간편 인증 및 가입 완료되었습니다.");
+        }
+
+        function authenticateWithLinkedIn() {
+            currentUser.company = "라인";
+            currentUser.domain = "@linecorp.com";
+            currentUser.role = "테크니컬 PM";
+            currentUser.verified = true;
+            updateUserProfileUI();
+            closeModal('verificationModal');
+            showToast("⚡️ LinkedIn 커리어 연동 인증이 완료되었습니다.");
+        }
+
+        function updateUserProfileUI() {
+            document.getElementById('myName').innerText = currentUser.nickname;
+            document.getElementById('myRole').innerText = `${currentUser.company} • ${currentUser.role}`;
+            document.getElementById('userVerificationText').innerText = `${currentUser.company} 인증됨`;
+            document.getElementById('myOfficeLoc').innerText = currentUser.office;
+            document.getElementById('myDomain').innerText = currentUser.domain;
+            document.getElementById('myAvatar').src = currentUser.avatar;
+            document.getElementById('headerPassCount').innerHTML = `이용권 <b class="text-amber-700">${currentUser.passes}회</b>`;
+        }
+
+        function handleAvatarFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    tempAvatarDataUrl = evt.target.result;
+                    document.getElementById('settingAvatarPreview').src = tempAvatarDataUrl;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function selectPresetAvatar(url) {
+            tempAvatarDataUrl = url;
+            document.getElementById('settingAvatarPreview').src = url;
+        }
+
+        function saveProfileSettings() {
+            const newNickname = document.getElementById('settingNicknameInput').value.trim();
+            if (newNickname) {
+                currentUser.nickname = newNickname;
+            }
+            if (tempAvatarDataUrl) {
+                currentUser.avatar = tempAvatarDataUrl;
+            }
+            currentUser.isPrivate = document.getElementById('settingPrivateProfileToggle').checked;
+
+            if (currentUser.isPrivate) {
+                document.getElementById('privateStatusTag').classList.remove('hidden');
+            } else {
+                document.getElementById('privateStatusTag').classList.add('hidden');
+            }
+
+            updateUserProfileUI();
+            closeModal('profileSettingsModal');
+            showToast("프로필 설정이 저장되었습니다.");
+        }
+
+        function toggleMyChatStatus() {
+            currentUser.chatStatusOn = document.getElementById('myChatStatusToggle').checked;
+            const label = document.getElementById('myChatStatusLabel');
+            if (currentUser.chatStatusOn) {
+                label.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> 🟢 커피챗 수신 중 (ON)`;
+                label.className = "text-[11px] font-bold text-emerald-700 flex items-center gap-1";
+                showToast("커피챗 수신 상태가 ON으로 설정되었습니다.");
+            } else {
+                label.innerHTML = `<span class="w-2 h-2 rounded-full bg-stone-400 inline-block"></span> 🔴 커피챗 수신 거부 (OFF)`;
+                label.className = "text-[11px] font-bold text-stone-500 flex items-center gap-1";
+                showToast("커피챗 수신 상태가 OFF로 설정되었습니다.");
+            }
+        }
+
+        function submitBusinessInquiry() {
+            const company = document.getElementById('b2bCompany').value;
+            if (!company) {
+                showToast("문의 기업명을 입력해주세요.");
+                return;
+            }
+            closeModal('businessInquiryModal');
+            showToast("🏢 B2B 제휴 문의가 정상 접수되었습니다.");
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
 
         function showToast(message) {
             const toast = document.getElementById('toast');
@@ -1508,26 +2283,31 @@
             }, 3000);
         }
 
-        // Google Play Billing Handler
-        async function processPlayPurchase() {
-            const btn = document.getElementById('btnConfirmPlayPurchase');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-sm mr-2"></i> Google Play 승인 중...`;
-
-            setTimeout(() => {
-                const orderId = `GPA.3382-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`;
-                currentUser.passes += 1;
-                document.getElementById('headerPassCount').innerHTML = `이용권 <b class="text-amber-700">${currentUser.passes}회</b>`;
-                showToast(`🛍️ [Google Play] 결제 성공! (${orderId}) 이용권이 충전되었습니다.`);
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-lock text-sm mr-2"></i> 1회 클릭 구매 (Google Play)`;
-                closeModal('googlePlayModal');
-            }, 1000);
+        function dismissAndroidBanner() {
+            document.getElementById('androidInstallBanner').classList.add('hidden');
         }
+
+        function triggerAndroidAppInstall() {
+            if (androidDeferredPrompt) {
+                androidDeferredPrompt.prompt();
+                androidDeferredPrompt.userChoice.then(() => {
+                    dismissAndroidBanner();
+                });
+            } else {
+                showToast("📱 이미 모바일 앱으로 설치되어 있거나 준비되었습니다.");
+            }
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            androidDeferredPrompt = e;
+            document.getElementById('androidInstallBanner').classList.remove('hidden');
+        });
 
         window.onload = function() {
             initMap();
             switchTab('radar');
+            renderNotificationItems();
         };
     </script>
 </body>
