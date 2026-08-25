@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <!-- Android Viewport & Safe Area Optimization -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- Android Native App Metadata -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2c1804">
+    <meta name="application-name" content="OfficeBreak">
+    
+    <title>OfficeBreak - 1km 회사원 커피챗 플랫폼</title>
+    
+    <!-- Dynamic Inline Web App Manifest for Android PWA / APK Conversion -->
+    <link rel="manifest" id="manifestPlaceholder">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coffee: {
+                            50: '#fdfbf7',
+                            100: '#f7f2e8',
+                            200: '#eee3d0',
+                            500: '#b8860b',
+                            600: '#8b5a2b',
+                            700: '#6f4211',
+                            800: '#4a2c0b',
+                            900: '#2c1804',
+                        },
+                        brand: {
+                            primary: '#6f4211',
+                            accent: '#e07a5f',
+                            bg: '#faf8f5',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom Mobile & Safe Area Insets for Android */
+        :root {
+            --sat: env(safe-area-inset-top, 0px);
+            --sab: env(safe-area-inset-bottom, 0px);
+        }
+        
+        body {
+            padding-top: var(--sat);
+            padding-bottom: var(--sab);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c5b49e;
+            border-radius: 4px;
+        }
+
+        .leaflet-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 1.25rem;
+            z-index: 10;
+        }
+
+        /* Sliding Sidebar Drawer Animations */
+        #slidingSidebar {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #slidingSidebar.closed {
+            transform: translateX(-100%);
+        }
+        #slidingSidebar.open {
+            transform: translateX(0);
+        }
+
+        /* Mobile Touch Optimizations */
+        @media (max-width: 640px) {
+            .mobile-bottom-nav {
+                box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
+                padding-bottom: max(0.5rem, var(--sab));
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#f5f2eb] text-gray-800 font-sans min-h-screen flex flex-col antialiased relative overflow-x-hidden pb-20 sm:pb-0">
+
+    <!-- Android Native PWA Installation Floating Banner -->
+    <div id="androidInstallBanner" class="hidden fixed top-0 left-0 right-0 z-50 bg-stone-900 text-white px-4 py-2.5 shadow-xl flex items-center justify-between text-xs border-b border-amber-500/30">
+        <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-xl bg-amber-500 text-stone-950 font-black flex items-center justify-center text-sm shadow">
+                <i class="fa-brands fa-android"></i>
+            </div>
+            <div>
+                <p class="font-extrabold text-white text-xs">OfficeBreak 앱으로 설치</p>
+                <p class="text-[10px] text-stone-300">홈 화면에 추가하여 더 빠르게 이용하세요</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="dismissAndroidBanner()" class="text-stone-400 hover:text-white px-2 py-1 text-xs">닫기</button>
+            <button onclick="triggerAndroidAppInstall()" class="bg-amber-500 hover:bg-amber-400 text-stone-950 font-black px-3 py-1.5 rounded-xl shadow-xs text-xs flex items-center gap-1 cursor-pointer">
+                <i class="fa-solid fa-download"></i> 설치
+            </button>
+        </div>
+    </div>
+
+    <!-- Top Header Navigation -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-30 shadow-xs">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2">
+            
+            <!-- Left: Sliding Menu Trigger & Logo -->
+            <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+                <button onclick="toggleSidebarMenu()" class="p-2 sm:p-2.5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl transition cursor-pointer flex items-center gap-1.5 border border-stone-200 shadow-2xs">
+                    <i class="fa-solid fa-bars text-sm sm:text-base"></i>
+                    <span class="hidden md:inline text-xs font-extrabold">메뉴</span>
+                </button>
+
+                <div class="flex items-center space-x-2 truncate">
+                    <div class="bg-coffee-700 text-white p-1.5 sm:p-2 rounded-xl shadow-xs flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid font-bold fa-mug-hot text-sm sm:text-lg"></i>
+                    </div>
+                    <div class="truncate">
+                        <span class="text-base sm:text-lg font-black tracking-tight text-stone-900 flex items-center gap-1">
+                            OfficeBreak <span class="text-[9px] sm:text-[10px] bg-amber-600 text-white px-1.5 py-0.2 sm:px-2 sm:py-0.5 rounded-full font-black tracking-wide flex-shrink-0">⚡️ 십분내로 커피챗</span>
+                        </span>
+                        <p class="text-[10px] sm:text-[11px] text-stone-500 hidden sm:block truncate">도보 10분 내 검증된 동네 직장인 P2P 커넥트</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Hub Selector & Notifications -->
+            <div class="flex items-center space-x-1.5 sm:space-x-2.5 flex-shrink-0">
+                <!-- Location Hub Selector (PRO Restricted) -->
+                <div class="relative flex items-center gap-0.5 sm:gap-1 bg-stone-100 border border-stone-300 rounded-xl px-1.5 sm:px-2 py-0.5">
+                    <span class="text-[8px] sm:text-[9px] bg-amber-500 text-white font-black px-1 sm:px-1.5 py-0.2 rounded-full shadow-2xs">👑 PRO</span>
+                    <select id="hubSelector" onchange="changeBusinessHub(this.value)" class="bg-transparent text-stone-700 text-[11px] sm:text-xs rounded-xl focus:outline-none block p-1 font-bold cursor-pointer max-w-[110px] sm:max-w-none truncate">
+                        <option value="pangyo">📍 판교 테크노밸리</option>
+                        <option value="gangnam">📍 강남역 / 테헤란로 (PRO)</option>
+                        <option value="yeouido">📍 여의도 금융타운 (PRO)</option>
+                        <option value="seongsu">📍 성수 IT 클러스터 (PRO)</option>
+                    </select>
+                </div>
+
+                <!-- Notification Bell Icon -->
+                <div class="relative">
+                    <button onclick="toggleNotificationDropdown()" class="relative p-1.5 sm:p-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl transition cursor-pointer border border-stone-200">
+                        <i class="fa-solid fa-bell text-sm sm:text-base"></i>
+                        <span id="notifBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] sm:text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center border-2 border-white">2</span>
+                    </button>
+                    
+                    <!-- Notification Dropdown -->
+                    <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-stone-200 p-3 z-50 text-xs space-y-2">
+                        <div class="flex justify-between items-center border-b border-stone-100 pb-2">
+                            <span class="font-bold text-stone-800 flex items-center gap-1.5"><i class="fa-solid fa-bell text-amber-500"></i> 받은 커피챗 알림</span>
+                            <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-semibold" id="notifCountText">미확인 2건</span>
+                        </div>
+                        <div id="notifItemsContainer" class="space-y-2 max-h-60 overflow-y-auto">
+                            <!-- Populated dynamically -->
+                        </div>
+                        <button onclick="switchTab('chats'); toggleNotificationDropdown();" class="w-full text-center text-stone-500 hover:text-stone-800 text-[11px] font-medium pt-1 border-t border-stone-100 block cursor-pointer">
+                            전체 신청 현황 보러가기 →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Header Pass Balance Button -->
+                <button onclick="switchTab('pricing')" class="flex items-center space-x-1 bg-amber-50 border border-amber-300 text-amber-900 px-2 py-1.5 rounded-xl hover:bg-amber-100 transition shadow-2xs cursor-pointer">
+                    <i class="fa-solid fa-ticket text-amber-600 text-xs"></i>
+                    <span id="headerPassCount" class="text-[11px] sm:text-xs font-extrabold">이용권 <b class="text-amber-700">3회</b></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sliding Sidebar Overlay Backdrop -->
+    <div id="sidebarBackdrop" onclick="toggleSidebarMenu()" class="fixed inset-0 bg-stone-900/50 backdrop-blur-xs z-40 hidden transition-opacity duration-300"></div>
+
+    <!-- Sliding Sidebar Drawer -->
+    <aside id="slidingSidebar" class="closed fixed top-0 left-0 h-full w-[85vw] max-w-xs sm:w-80 bg-white border-r border-stone-200 z-50 p-4 sm:p-5 shadow-2xl overflow-y-auto flex flex-col justify-between space-y-5">
+        <div class="space-y-4">
+            <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-bars text-coffee-700"></i>
+                    <h3 class="font-black text-stone-800 text-sm">오피스브레이크 메뉴</h3>
+                </div>
+                <button onclick="toggleSidebarMenu()" class="p-1.5 text-stone-400 hover:text-stone-700 rounded-lg text-lg cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- User Profile Card -->
+            <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200 space-y-3">
+                <div class="flex items-center space-x-3">
+                    <img id="myAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="My Avatar" class="w-12 h-12 rounded-full object-cover border-2 border-stone-300 flex-shrink-0">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5">
+                            <h3 id="myName" class="font-bold text-stone-800 text-sm truncate">김서연 프로</h3>
+                            <span id="privateStatusTag" class="hidden bg-stone-800 text-white text-[9px] px-1.5 py-0.2 rounded font-black">🔒 비공개</span>
+                        </div>
+                        <p id="myRole" class="text-xs text-stone-500 truncate">카카오 • 서비스 기획자</p>
+                        
+                        <!-- Verification Badge -->
+                        <div class="mt-1">
+                            <span id="userCompanyTag" onclick="openVerificationModal()" class="inline-flex items-center gap-1 bg-emerald-50 border border-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full text-[10px] font-bold cursor-pointer hover:bg-emerald-100 transition">
+                                <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                                <span id="userVerificationText">카카오 인증됨 (리멤버)</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coffee Chat ON/OFF Status Switch -->
+                <div class="bg-amber-50/80 border border-amber-200/70 p-3 rounded-xl space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-stone-800 flex items-center gap-1">
+                            <i class="fa-solid fa-power-off text-amber-600"></i> 커피챗 수신 상태
+                        </span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="myChatStatusToggle" onchange="toggleMyChatStatus()" class="sr-only peer" checked>
+                            <div class="w-9 h-5 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+                    <p id="myChatStatusLabel" class="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> 🟢 커피챗 수신 중 (ON)
+                    </p>
+                </div>
+
+                <div class="bg-white p-2.5 rounded-xl text-xs text-stone-600 space-y-1 border border-stone-200">
+                    <div class="flex justify-between">
+                        <span>등록 위치:</span>
+                        <span id="myOfficeLoc" class="font-semibold text-stone-800">판교 H 스퀘어 N동</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>인증 도메인:</span>
+                        <span id="myDomain" class="font-semibold text-stone-800">@kakao.com</span>
+                    </div>
+                    <div class="flex justify-between items-center text-amber-900 font-bold">
+                        <span>내 인기도:</span>
+                        <span id="myPopularityBadge" class="bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full text-[10px] font-black flex items-center gap-1">
+                            <i class="fa-solid fa-fire text-orange-500"></i> <b id="sidebarPopularityScore">14 P</b>
+                        </span>
+                    </div>
+                    <div class="flex justify-between pt-1 border-t border-stone-100 text-amber-800 font-bold">
+                        <span>멤버십 회원:</span>
+                        <span id="mySubStatus" class="bg-stone-200 text-stone-700 px-1.5 py-0.5 rounded text-[10px]">일반 회원</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="openProfileSettingsModal()" class="w-full text-xs bg-stone-900 hover:bg-black text-amber-400 py-2.5 rounded-xl transition font-bold flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                        <i class="fa-solid fa-user-gear"></i> 프로필 설정
+                    </button>
+                    <button onclick="openVerificationModal()" class="w-full text-xs bg-stone-200 hover:bg-stone-300 text-stone-700 py-2.5 rounded-xl transition font-semibold flex items-center justify-center gap-1 cursor-pointer">
+                        <i class="fa-solid fa-building text-stone-500"></i> 소속 인증
+                    </button>
+                </div>
+            </div>
+
+            <nav class="space-y-1">
+                <button onclick="switchTab('radar')" id="nav-radar" class="tab-btn active w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-bold text-xs text-stone-700 hover:bg-stone-100 transition cursor-pointer">
+                    <div class="flex items-center space-x-2.5">
+                        <i class="fa-solid fa-radar text-coffee-600 text-base"></i>
+                        <span>1km 레이더 (십분내 탐색)</span>
+                    </div>
+                    <span id="nearbyPeerCount" class="bg-coffee-100 text-coffee-800 text-[10px] px-2 py-0.5 rounded-full font-extrabold">4명</span>
+                </button>
+
+                <button onclick="switchTab('chats')" id="nav-chats" class="tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-medium text-xs text-stone-700 hover:bg-stone-100 transition cursor-pointer">
+                    <div class="flex items-center space-x-2.5">
+                        <i class="fa-solid fa-comments text-stone-500 text-base"></i>
+                        <span>커피챗 현황 및 메세지</span>
+                    </div>
+                    <span id="chatBadge" class="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">2</span>
+                </button>
+
+                <button onclick="switchTab('ranking')" id="nav-ranking" class="tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-medium text-xs text-stone-700 hover:bg-stone-100 transition cursor-pointer">
+                    <div class="flex items-center space-x-2.5">
+                        <i class="fa-solid fa-fire-flame-curved text-orange-500 text-base"></i>
+                        <span>지역별 인기도 랭킹</span>
+                    </div>
+                    <span class="bg-orange-100 text-orange-800 text-[10px] px-2 py-0.5 rounded-full font-extrabold">TOP 10 🔥</span>
+                </button>
+
+                <button onclick="switchTab('aiTopics')" id="nav-aiTopics" class="tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-medium text-xs text-stone-700 hover:bg-stone-100 transition cursor-pointer">
+                    <div class="flex items-center space-x-2.5">
+                        <i class="fa-solid fa-wand-magic-sparkles text-purple-600 text-base"></i>
+                        <span>AI 대화 주제 제안</span>
+                    </div>
+                    <span class="bg-purple-100 text-purple-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Gemini</span>
+                </button>
+
+                <button onclick="switchTab('reviews')" id="nav-reviews" class="tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-medium text-xs text-stone-700 hover:bg-stone-100 transition cursor-pointer">
+                    <div class="flex items-center space-x-2.5">
+                        <i class="fa-solid fa-star text-amber-500 text-base"></i>
+                        <span>생생 후기</span>
+                    </div>
+                    <span class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">주간 Best 🏆</span>
+                </button>
+
+                <button onclick="switchTab('pricing')" id="nav-pricing" class="tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-medium text-xs text-stone-700 hover:bg-stone-100 transition cursor-pointer">
+                    <div class="flex items-center space-x-2.5">
+                        <i class="fa-solid fa-gem text-amber-600 text-base"></i>
+                        <span>이용권 / 구독 요금제</span>
+                    </div>
+                    <span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded font-bold">PRO</span>
+                </button>
+            </nav>
+        </div>
+
+        <button onclick="openBusinessInquiryModal()" class="w-full bg-stone-900 hover:bg-black text-amber-400 p-3 rounded-xl text-xs font-bold transition flex items-center justify-between shadow-xs mt-auto cursor-pointer">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-building-circle-check text-base"></i>
+                <div class="text-left">
+                    <p class="font-bold">B2B 기업/제휴 문의</p>
+                    <p class="text-[10px] text-stone-400">직장인 크로스 교류회 & 후원</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-xs text-amber-400"></i>
+        </button>
+    </aside>
+
+    <!-- MAIN VIEWPORT -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-5 flex-grow w-full">
+
+        <!-- TAB 1: 1KM RADAR & MAP -->
+        <div id="tab-content-radar" class="tab-panel space-y-4 sm:space-y-5">
+            
+            <div class="bg-gradient-to-r from-stone-900 via-coffee-900 to-amber-950 text-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+                <div>
+                    <div class="flex items-center space-x-2 mb-1">
+                        <span class="bg-amber-500 text-stone-950 text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full">P2P CONNECT</span>
+                        <span class="text-[11px] sm:text-xs text-amber-200 font-semibold">⚡️ 십분내로 커피챗</span>
+                    </div>
+                    <h2 class="text-base sm:text-xl font-extrabold tracking-tight flex items-center gap-1.5 sm:gap-2">
+                        <i class="fa-solid fa-location-dot text-amber-400 text-sm sm:text-base"></i>
+                        걸어서 10분 내, 커피 한 잔으로 만나는 내 주변 직장인
+                    </h2>
+                    <p class="text-[11px] sm:text-xs text-stone-300 mt-1" id="radarSubtitle">
+                        현재 <span class="font-bold text-amber-300">판교 H스퀘어</span> 기준 1km 내 검증된 직장인 탐색 중
+                    </p>
+                </div>
+
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <button onclick="toggleViewMode('map')" id="btnViewMap" class="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs font-bold rounded-xl bg-amber-500 text-stone-950 shadow-2xs transition cursor-pointer">
+                        <i class="fa-solid fa-map mr-1"></i> 지도뷰
+                    </button>
+                    <button onclick="toggleViewMode('list')" id="btnViewList" class="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs font-bold rounded-xl bg-stone-800 text-stone-200 hover:bg-stone-700 transition cursor-pointer">
+                        <i class="fa-solid fa-list mr-1"></i> 카드리스트뷰
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Filter Bar -->
+            <div class="bg-white p-3 sm:p-3.5 rounded-2xl border border-stone-200 shadow-2xs flex flex-wrap items-center justify-between gap-2.5 text-xs">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                    <div class="flex items-center space-x-1">
+                        <i class="fa-solid fa-filter text-coffee-600 text-xs"></i>
+                        <span class="font-bold text-stone-700 text-[11px] sm:text-xs">필터:</span>
+                    </div>
+
+                    <select id="distanceFilter" onchange="applyFilters()" class="flex-1 sm:flex-none bg-stone-50 border border-stone-300 text-stone-800 text-[11px] sm:text-xs rounded-xl p-1.5 sm:p-2 font-semibold">
+                        <option value="1000" selected>📏 도보 10분 (1km)</option>
+                        <option value="500">📏 도보 5분 (500m)</option>
+                        <option value="300">📏 건물 앞 (300m)</option>
+                    </select>
+
+                    <select id="topicFilter" onchange="applyFilters()" class="flex-1 sm:flex-none bg-stone-50 border border-stone-300 text-stone-800 text-[11px] sm:text-xs rounded-xl p-1.5 sm:p-2 font-semibold">
+                        <option value="all">💬 전체 주제</option>
+                        <option value="직무/커리어">💡 직무/커리어</option>
+                        <option value="이직/업계동향">🚀 이직 & 동향</option>
+                        <option value="가벼운 점심">☕ 점심/수다</option>
+                        <option value="창업/사이드">🔥 창업/사이드</option>
+                    </select>
+
+                    <select id="statusFilter" onchange="applyFilters()" class="w-full sm:w-auto bg-stone-50 border border-stone-300 text-stone-800 text-[11px] sm:text-xs rounded-xl p-1.5 sm:p-2 font-semibold">
+                        <option value="ON" selected>🟢 커피챗 수신중 (ON)</option>
+                        <option value="ALL">ALL 전체 (PRO 전용 OFF 포함)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Leaflet Map Container -->
+            <div id="mapViewContainer" class="bg-white rounded-2xl border border-stone-200 p-1.5 sm:p-2 shadow-2xs h-[360px] sm:h-[440px] relative overflow-hidden transition-all">
+                <div id="leafletMap" class="w-full h-full rounded-xl"></div>
+                
+                <!-- Floating Map Legend -->
+                <div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md px-3 py-2 rounded-xl shadow-md border border-stone-200 z-20 text-[10px] sm:text-xs space-y-1">
+                    <div class="flex items-center space-x-1.5">
+                        <span class="w-3 h-3 rounded-full bg-coffee-700 inline-block border-2 border-white shadow-2xs"></span>
+                        <span class="font-bold text-stone-800">내 위치 (카카오)</span>
+                    </div>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block border-2 border-white shadow-2xs"></span>
+                        <span class="font-medium text-stone-700">커피챗 수신중 (도보 10분내)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Peer Candidate Cards Grid View -->
+            <div id="peerCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- TAB 2: COFFEE CHAT REQUESTS & MESSAGES -->
+        <div id="tab-content-chats" class="tab-panel hidden space-y-6">
+            
+            <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <h3 class="font-bold text-stone-800 text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-inbox text-amber-600"></i>
+                            커피챗 신청 및 수락 현황
+                        </h3>
+                        <span class="text-[10px] bg-red-100 text-red-800 px-2 py-0.5 rounded-full font-extrabold flex items-center gap-1">
+                            <i class="fa-solid fa-clock"></i> 3일 미응답 시 자동 삭제
+                        </span>
+                    </div>
+
+                    <div class="flex items-center bg-stone-100 p-1 rounded-xl text-xs font-bold gap-1 self-start sm:self-auto">
+                        <button onclick="switchReqSubTab('received')" id="subtab-received" class="px-3 py-1.5 rounded-lg bg-white text-stone-800 shadow-2xs transition cursor-pointer">
+                            📥 받은 신청 (<span id="incomingRequestsCount">2</span>)
+                        </button>
+                        <button onclick="switchReqSubTab('sent')" id="subtab-sent" class="px-3 py-1.5 rounded-lg text-stone-500 hover:text-stone-800 transition cursor-pointer">
+                            📤 내가 보낸 신청 (<span id="sentRequestsCount">1</span>)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="receivedRequestsContainer" class="space-y-3">
+                    <div id="receivedRequestsList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                </div>
+
+                <div id="sentRequestsContainer" class="hidden space-y-3">
+                    <div id="sentRequestsList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                </div>
+            </div>
+
+            <!-- Active & Completed Chats Header -->
+            <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div class="flex items-center space-x-3">
+                    <h2 class="text-base sm:text-lg font-bold text-stone-800 flex items-center gap-2">
+                        <i class="fa-solid fa-mug-saucer text-coffee-600"></i>
+                        커피챗 일정 & 대화방
+                    </h2>
+                    <span class="text-xs bg-stone-100 text-stone-600 px-2.5 py-0.5 rounded-full font-bold">
+                        진행 중 <b id="totalChatCount" class="text-coffee-700">1</b>건 • 완료 <b id="totalCompletedChatCount" class="text-emerald-700">1</b>건
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-1 bg-stone-100 p-1 rounded-xl text-xs font-bold">
+                    <button onclick="switchChatFilter('active')" id="chatFilterActive" class="px-3 py-1 rounded-lg bg-white text-stone-800 shadow-2xs cursor-pointer">
+                        💬 진행 중인 대화
+                    </button>
+                    <button onclick="switchChatFilter('completed')" id="chatFilterCompleted" class="px-3 py-1 rounded-lg text-stone-500 hover:text-stone-800 cursor-pointer">
+                        ✅ 지난 완료된 커피챗
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left: Chat List -->
+                <div class="bg-white rounded-2xl border border-stone-200 p-4 shadow-sm space-y-3">
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2" id="chatListHeaderTitle">진행 중인 대화 목록</h3>
+                    <div id="coffeeChatList" class="space-y-2"></div>
+                </div>
+
+                <!-- Right: Active Chat Window -->
+                <div class="lg:col-span-2 bg-white rounded-2xl border border-stone-200 p-5 shadow-sm min-h-[450px] flex flex-col justify-between" id="activeChatWindow">
+                    <div class="text-center my-auto py-12 text-stone-400" id="noChatSelectedState">
+                        <i class="fa-solid fa-comments text-5xl mb-3 text-stone-300"></i>
+                        <p class="font-medium text-stone-600">좌측 목록에서 커피챗을 선택하거나<br>새로운 커피챗을 신청해보세요.</p>
+                    </div>
+
+                    <div id="activeChatContent" class="hidden flex-col h-full space-y-4">
+                        <div class="pb-3 border-b border-stone-200 flex justify-between items-center flex-wrap gap-2">
+                            <div class="flex items-center space-x-3">
+                                <img id="chatPeerAvatar" src="" class="w-10 h-10 rounded-full object-cover border">
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <h4 id="chatPeerName" class="font-bold text-stone-800"></h4>
+                                        <span id="chatPeerCompany" class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold"></span>
+                                        <span id="chatStatusBadge" class="bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded-full font-bold hidden">진행중</span>
+                                    </div>
+                                    <p id="chatPeerDetails" class="text-xs text-stone-500"></p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-2">
+                                <div class="text-right">
+                                    <span id="chatMeetingTime" class="text-xs font-bold text-coffee-700 bg-coffee-50 px-2.5 py-1 rounded-lg"></span>
+                                    <p id="chatMeetingPlace" class="text-[11px] text-stone-500 mt-1"></p>
+                                </div>
+                                <button id="btnCompleteChatAction" onclick="markCurrentChatAsCompleted()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow-2xs flex items-center gap-1 cursor-pointer">
+                                    <i class="fa-solid fa-circle-check"></i> 커피챗 완료하기
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="chatMessagesBox" class="flex-grow overflow-y-auto max-h-[300px] min-h-[220px] space-y-3 p-3 bg-stone-50 rounded-xl border border-stone-100"></div>
+
+                        <div id="chatIcebreakerBanner" class="bg-purple-50 border border-purple-200 p-3 rounded-xl flex items-center justify-between text-xs">
+                            <div class="flex items-center space-x-2 text-purple-900">
+                                <i class="fa-solid fa-wand-magic-sparkles text-purple-600"></i>
+                                <span>무슨 말을 꺼낼지 고민되시나요? Gemini 추천 질문을 써보세요.</span>
+                            </div>
+                            <button onclick="generateChatSpecificIcebreaker()" class="bg-purple-600 text-white px-2.5 py-1 rounded-lg font-medium hover:bg-purple-700 transition cursor-pointer">
+                                질문 생성
+                            </button>
+                        </div>
+
+                        <div id="chatInputContainer" class="flex items-center gap-2 pt-2 border-t border-stone-200">
+                            <input type="text" id="chatInputMessage" onkeydown="if(event.key === 'Enter') sendChatMessage()" placeholder="메시지를 입력하세요..." class="flex-grow bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-coffee-500">
+                            <button onclick="sendChatMessage()" class="bg-coffee-700 hover:bg-coffee-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow flex items-center gap-1 cursor-pointer">
+                                <i class="fa-solid fa-paper-plane"></i> 전송
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: REGIONAL POPULARITY RANKING -->
+        <div id="tab-content-ranking" class="tab-panel hidden space-y-6">
+            <div class="bg-gradient-to-r from-orange-950 via-amber-900 to-stone-900 text-white p-6 rounded-3xl shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative overflow-hidden">
+                <div class="space-y-1.5 z-10">
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-orange-500 text-stone-950 text-[10px] font-black px-2.5 py-0.5 rounded-full">COMMUNITY TRUST</span>
+                        <span class="text-xs text-amber-200 font-semibold">🔥 수락 1회당 인기도 +1 P</span>
+                    </div>
+                    <h2 class="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                        <i class="fa-solid fa-crown text-amber-400"></i>
+                        <span id="rankingHubTitle">판교 테크노밸리</span> 지역 직장인 인기도 랭킹
+                    </h2>
+                    <p class="text-xs text-stone-300">
+                        커피챗을 수락할 때마다 인기도가 상승하며, 지역 내 검증된 네트워킹 인사이더로 추천됩니다.
+                    </p>
+                </div>
+                
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-3.5 rounded-2xl text-right z-10 w-full sm:w-auto">
+                    <p class="text-[10px] text-amber-200 font-medium">나의 인기도 & 순위</p>
+                    <div class="text-lg font-black text-amber-300 flex items-center justify-end gap-1.5">
+                        <i class="fa-solid fa-fire text-orange-400"></i>
+                        <span id="myPopularityDisplay">14 P</span>
+                        <span class="text-xs font-bold text-white bg-orange-600/80 px-2 py-0.5 rounded-md" id="myRankDisplay">3위</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-3xl border border-stone-200 shadow-sm space-y-4">
+                <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                    <h3 class="font-bold text-stone-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-amber-500"></i>
+                        이번 달 지역 내 커피챗 인사이더 TOP 10
+                    </h3>
+                    <span class="text-xs bg-orange-50 text-orange-800 px-2.5 py-1 rounded-full font-bold border border-orange-200">
+                        ⚡️ 실시간 집계 중
+                    </span>
+                </div>
+
+                <div id="popularityLeaderboardContainer" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- TAB 4: AI TOPICS & ICEBREAKER GENERATOR -->
+        <div id="tab-content-aiTopics" class="tab-panel hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-stone-800">Gemini AI 맞춤형 커피챗 질문 & 대화 카드</h2>
+                        <p class="text-xs text-stone-500">상대방의 직무와 내 관심사를 기반으로 자연스럽고 유익한 커피챗 주제를 AI가 추천합니다.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-600 mb-1">상대 직무/회사 선택</label>
+                        <select id="aiPeerSelect" class="w-full text-xs bg-stone-50 border border-stone-200 rounded-xl p-2.5 font-medium">
+                            <option value="개발자|네이버">네이버 프론트엔드 개발자</option>
+                            <option value="PO|토스">토스 프로덕트 오너 (PO)</option>
+                            <option value="마케터|쿠팡">쿠팡 브랜드 마케터</option>
+                            <option value="VC 심사역|알토스">알토스벤처스 투자 심사역</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-600 mb-1">원하는 대화 성격</label>
+                        <select id="aiToneSelect" class="w-full text-xs bg-stone-50 border border-stone-200 rounded-xl p-2.5 font-medium">
+                            <option value="실무 노하우 및 커리어 상담">💡 깊이 있는 실무 & 커리어 노하우</option>
+                            <option value="업계 동향 및 이직 관련">🚀 업계 트렌드 및 이직 정보</option>
+                            <option value="가벼운 점심 수다 및 네트워크">☕ 부담 없는 동네 직장인 수다</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="fetchAITopics()" id="btnGenerateAI" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs py-2.5 px-4 rounded-xl transition flex items-center justify-center space-x-2 shadow-sm cursor-pointer">
+                            <i class="fa-solid fa-sparkles"></i>
+                            <span>주제 & 질문 생성하기</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="aiResultContainer" class="mt-6 pt-4 border-t border-stone-200 space-y-4">
+                    <div class="text-center py-8 text-stone-400" id="aiPlaceholderState">
+                        <i class="fa-solid fa-robot text-4xl mb-2 text-purple-200"></i>
+                        <p class="text-xs">버튼을 누르면 Gemini AI가 3가지 맞춤 질문과 대화 팁을 생성합니다.</p>
+                    </div>
+                    <div id="aiOutputContent" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: REVIEWS & WEEKLY BEST -->
+        <div id="tab-content-reviews" class="tab-panel hidden space-y-6">
+            <div class="bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 text-white p-6 rounded-3xl shadow-xl space-y-3 relative overflow-hidden">
+                <div class="relative z-10 flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <span class="bg-amber-400/20 text-amber-200 border border-amber-300/30 text-xs font-bold px-3 py-1 rounded-full inline-block mb-2">
+                            🏆 매주 일요일 밤 12시 발표
+                        </span>
+                        <h2 class="text-xl font-extrabold tracking-tight">주간 베스트 5 커피챗 후기 시상식</h2>
+                        <p class="text-xs text-amber-100 mt-1 max-w-xl">
+                            이번 주 가장 진솔하고 도움이 된 후기 작성자 상위 5분께 **스타벅스 커피 쿠폰 100%**를 매주 증정합니다!
+                        </p>
+                    </div>
+                    <button onclick="openReviewModal()" class="bg-amber-400 hover:bg-amber-300 text-amber-950 font-extrabold text-xs px-4 py-3 rounded-2xl transition shadow-lg flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>커피챗 후기 남기기</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-bold text-stone-800 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-amber-500"></i> 주간 Best 5 커피챗 후기
+                </h3>
+                <div id="weeklyBestFeedContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+                <h3 class="font-bold text-stone-800 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-coffee-600"></i> 최근 1개월 생생 후기 (<span id="totalReviewsCount">3</span>건)
+                </h3>
+                <div id="reviewsFeedContainer" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- TAB 6: PRICING & SUBSCRIPTIONS -->
+        <div id="tab-content-pricing" class="tab-panel hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-stone-200 shadow-sm space-y-6">
+                <div class="text-center max-w-xl mx-auto space-y-2">
+                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full inline-block">AFFORDABLE CONNECT</span>
+                    <h2 class="text-2xl font-black text-stone-900">저가 커피 한 잔 가격으로 만드는 인맥</h2>
+                    <p class="text-xs text-stone-500">부담 없는 ₩1,800원으로 도보 10분 거리 검증된 직장인과 커피 한 잔하며 귀한 이야기 나누세요.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200 flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <span class="bg-stone-200 text-stone-700 text-[10px] font-bold px-2 py-0.5 rounded">1회 이용권</span>
+                            <h3 class="text-lg font-black text-stone-800">단품 신청권</h3>
+                            <div class="text-2xl font-black text-coffee-800">₩1,800 <span class="text-xs font-normal text-stone-500">/ 1회</span></div>
+                            <p class="text-[11px] text-stone-500">메가커피 1잔 값으로 가볍게 시작하는 1회 커피챗 신청권</p>
+                        </div>
+                        <button onclick="buyPassPackage('1회', 1800, 1)" class="w-full bg-stone-800 hover:bg-black text-white text-xs font-bold py-2.5 rounded-xl transition cursor-pointer">
+                            1회권 구매
+                        </button>
+                    </div>
+
+                    <div class="bg-amber-50 p-5 rounded-2xl border-2 border-amber-300 flex flex-col justify-between space-y-4 relative">
+                        <span class="absolute -top-2.5 right-3 bg-amber-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full">⚡️ 베스트 번들</span>
+                        <div class="space-y-2">
+                            <span class="bg-amber-200 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded">10회 + 1회 서비스</span>
+                            <h3 class="text-lg font-black text-amber-950">11회 패키지</h3>
+                            <div class="text-2xl font-black text-amber-900">₩15,000 <span class="text-xs font-normal text-stone-500">/ 11회</span></div>
+                            <p class="text-[11px] text-amber-800 font-medium">회당 ₩1,363원! 커피챗을 활발히 즐기시는 직장인 추천</p>
+                        </div>
+                        <button onclick="buyPassPackage('11회', 15000, 11)" class="w-full bg-coffee-700 hover:bg-coffee-800 text-white text-xs font-bold py-2.5 rounded-xl transition shadow cursor-pointer">
+                            11회 번들 구매
+                        </button>
+                    </div>
+
+                    <div class="bg-purple-50 p-5 rounded-2xl border border-purple-200 flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <span class="bg-purple-200 text-purple-900 text-[10px] font-bold px-2 py-0.5 rounded">PRO 멤버십</span>
+                            <h3 class="text-lg font-black text-purple-950">월간 PRO</h3>
+                            <div class="text-2xl font-black text-purple-900">₩30,000 <span class="text-xs font-normal text-stone-500">/ 월</span></div>
+                            <p class="text-[11px] text-purple-800">모든 거점(강남/여의도/성수) 전환, OFF 회원 인앱 알림 신청 & 무제한 커피챗</p>
+                        </div>
+                        <button onclick="subscribeMembership('월간PRO', 30000)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow cursor-pointer">
+                            월간 PRO 구독
+                        </button>
+                    </div>
+
+                    <div class="bg-stone-900 text-white p-5 rounded-2xl border border-stone-800 flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <span class="bg-amber-400 text-stone-950 text-[10px] font-black px-2 py-0.5 rounded">33% 할인</span>
+                            <h3 class="text-lg font-black text-white">연간 PRO</h3>
+                            <div class="text-2xl font-black text-amber-400">₩240,000 <span class="text-xs font-normal text-stone-400">/ 년</span></div>
+                            <p class="text-[11px] text-stone-300">월 ₩20,000원 수준으로 1년 동안 무제한 커리어 네트워킹</p>
+                        </div>
+                        <button onclick="subscribeMembership('연간PRO', 240000)" class="w-full bg-amber-400 hover:bg-amber-300 text-stone-950 text-xs font-black py-2.5 rounded-xl transition shadow cursor-pointer">
+                            연간 PRO 시작
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MOBILE STICKY BOTTOM NAVIGATION BAR -->
+    <nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 z-30 flex items-center justify-around py-1.5 px-2 mobile-bottom-nav">
+        <button onclick="switchTab('radar')" class="flex flex-col items-center justify-center space-y-0.5 text-stone-600 active:text-coffee-700 p-1 cursor-pointer">
+            <i class="fa-solid fa-radar text-base"></i>
+            <span class="text-[9px] font-bold">1km 레이더</span>
+        </button>
+        <button onclick="switchTab('chats')" class="flex flex-col items-center justify-center space-y-0.5 text-stone-600 active:text-coffee-700 p-1 relative cursor-pointer">
+            <i class="fa-solid fa-comments text-base"></i>
+            <span class="text-[9px] font-bold">커피챗</span>
+            <span class="absolute top-0 right-2 w-2 h-2 bg-amber-500 rounded-full"></span>
+        </button>
+        <button onclick="switchTab('ranking')" class="flex flex-col items-center justify-center space-y-0.5 text-stone-600 active:text-coffee-700 p-1 cursor-pointer">
+            <i class="fa-solid fa-fire text-base text-orange-500"></i>
+            <span class="text-[9px] font-bold">인기도 랭킹</span>
+        </button>
+        <button onclick="switchTab('reviews')" class="flex flex-col items-center justify-center space-y-0.5 text-stone-600 active:text-coffee-700 p-1 cursor-pointer">
+            <i class="fa-solid fa-star text-base text-amber-500"></i>
+            <span class="text-[9px] font-bold">생생후기</span>
+        </button>
+        <button onclick="toggleSidebarMenu()" class="flex flex-col items-center justify-center space-y-0.5 text-stone-600 active:text-coffee-700 p-1 cursor-pointer">
+            <i class="fa-solid fa-bars text-base"></i>
+            <span class="text-[9px] font-bold">메뉴</span>
+        </button>
+    </nav>
+
+    <!-- Verification Modal -->
+    <div id="verificationModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-coffee-100 text-coffee-800 flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h3 class="font-bold text-stone-800 text-sm sm:text-base">회사 소속 및 신원 인증</h3>
+                </div>
+                <button onclick="closeModal('verificationModal')" class="text-stone-400 hover:text-stone-600 text-lg p-1 cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200/80 p-3 rounded-2xl text-center space-y-0.5">
+                <p class="text-xs font-black text-amber-900 flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-gift text-amber-600"></i> 최초 회사 인증 시 무료 이용권 1회 증정!
+                </p>
+                <p class="text-[10px] text-amber-700 font-medium">유효기간: 회사 인증 완료일로부터 1개월 (30일)</p>
+            </div>
+
+            <div class="space-y-2.5">
+                <p class="text-[11px] font-bold text-stone-700">⚡️ 기존 프로필로 1초 간편 인증 & 가입</p>
+                <button onclick="authenticateWithRemember()" class="w-full bg-[#1b3152] hover:bg-[#12223a] text-white py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-between shadow-sm cursor-pointer">
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-amber-400 text-stone-950 px-1.5 py-0.5 rounded text-[10px] font-black">Remember</span>
+                        <span>리멤버 명함 프로필로 1초 인증</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs opacity-70"></i>
+                </button>
+                <button onclick="authenticateWithLinkedIn()" class="w-full bg-[#0a66c2] hover:bg-[#084e96] text-white py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-between shadow-sm cursor-pointer">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-brands fa-linkedin text-base"></i>
+                        <span>LinkedIn 커리어 프로필 연동 인증</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs opacity-70"></i>
+                </button>
+            </div>
+
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-stone-200"></div>
+                <span class="flex-shrink mx-3 text-[10px] text-stone-400 font-semibold">또는 이메일 직접 인증</span>
+                <div class="flex-grow border-t border-stone-200"></div>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">회사 이메일 주소</label>
+                    <div class="flex gap-2">
+                        <input type="email" id="emailInput" placeholder="name@kakao.com" class="flex-grow bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs font-medium focus:ring-2 focus:ring-coffee-500 focus:outline-none">
+                        <button type="button" onclick="sendVerificationEmail()" id="btnSendCode" class="bg-stone-800 hover:bg-black text-white text-xs font-bold px-3 py-2.5 rounded-xl transition flex-shrink-0 shadow-xs cursor-pointer">
+                            인증번호 발송
+                        </button>
+                    </div>
+                </div>
+
+                <div id="codeVerifySection" class="hidden space-y-2 bg-amber-50/60 p-3 rounded-2xl border border-amber-200/80">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-xs font-bold text-amber-900">인증번호 4자리 입력</label>
+                        <div class="flex items-center gap-2">
+                            <span id="timerDisplay" class="text-xs font-extrabold text-red-600 bg-white px-2 py-0.5 rounded-md border border-red-200">03:00</span>
+                            <button type="button" onclick="sendVerificationEmail()" class="text-[10px] text-stone-600 underline hover:text-black font-bold cursor-pointer">재발송</button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="codeInput" maxlength="4" placeholder="4자리 숫자" class="flex-grow bg-white border border-stone-300 text-center font-black tracking-widest text-base rounded-xl py-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <button type="button" onclick="verifyEmailCode()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs cursor-pointer">
+                            인증확인
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white/90 p-2.5 rounded-xl border border-amber-300 text-[11px] text-amber-950 flex items-center justify-between shadow-2xs">
+                        <span class="font-medium text-stone-700">📩 발송된 인증번호 (데모): <b id="demoCodeDisplay" class="text-amber-800 font-black text-sm tracking-wider">----</b></span>
+                        <button type="button" onclick="autoFillDemoCode()" class="bg-amber-500 hover:bg-amber-600 text-stone-950 px-2.5 py-1 rounded-lg text-[10px] font-black border border-amber-400 shadow-2xs cursor-pointer">
+                            ⚡️ 자동 입력
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">사무실 위치</label>
+                    <input type="text" id="officeLocInput" value="판교 H 스퀘어 N동" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">직무 / 담당 업무</label>
+                    <input type="text" id="jobRoleInput" value="서비스 기획자 / PO" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-medium">
+                </div>
+            </div>
+
+            <button onclick="processDomainVerification()" class="w-full bg-coffee-700 hover:bg-coffee-800 text-white font-bold text-sm py-3 rounded-xl transition shadow-md cursor-pointer">
+                인증완료 및 가입
+            </button>
+        </div>
+    </div>
+
+    <!-- Request Coffee Chat Modal -->
+    <div id="coffeeChatModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                <div class="flex items-center space-x-3">
+                    <img id="targetPeerAvatar" src="" class="w-10 h-10 rounded-full object-cover border">
+                    <div>
+                        <h3 id="targetPeerName" class="font-bold text-stone-800"></h3>
+                        <span id="targetPeerCompany" class="text-xs text-stone-500"></span>
+                    </div>
+                </div>
+                <button onclick="closeModal('coffeeChatModal')" class="text-stone-400 hover:text-stone-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="font-semibold block mb-1">희망 주제</label>
+                    <select id="reqTopic" class="w-full bg-stone-50 border rounded-xl p-2.5 font-medium">
+                        <option value="직무/커리어">💡 직무 노하우 및 커리어 성장 이야기</option>
+                        <option value="이직/업계동향">🚀 업계동향 및 조직 문화 나누기</option>
+                        <option value="가벼운 점심">☕ 부담 없는 점심 식사/커피 한 잔</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-semibold block mb-1">희망 장소 (커피챗 수락 전 블러 처리됨)</label>
+                    <select id="reqCafe" class="w-full bg-stone-50 border rounded-xl p-2.5 font-medium"></select>
+                </div>
+                <div>
+                    <label class="font-semibold block mb-1">희망 시간대 (커피챗 수락 전 블러 처리됨)</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="selectTimeSlot(this, '점심시간 12:15')" class="time-slot-btn active border border-coffee-600 bg-coffee-50 text-coffee-800 py-2 rounded-xl font-semibold cursor-pointer">
+                            ☀️ 점심 12:15
+                        </button>
+                        <button type="button" onclick="selectTimeSlot(this, '오후 브레이크 15:00')" class="time-slot-btn border border-stone-200 bg-stone-50 text-stone-700 py-2 rounded-xl font-semibold cursor-pointer">
+                            ☕ 오후 15:00
+                        </button>
+                        <button type="button" onclick="selectTimeSlot(this, '퇴근 후 18:30')" class="time-slot-btn border border-stone-200 bg-stone-50 text-stone-700 py-2 rounded-xl font-semibold cursor-pointer">
+                            🌙 퇴근후 18:30
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="font-semibold">신청 메시지 <span class="text-[10px] text-red-500 font-normal">(구체적 시간/장소 표기 금지)</span></label>
+                        <button type="button" onclick="generateAIMessageForModal()" class="text-[11px] text-purple-700 font-bold flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI 인사말 생성
+                        </button>
+                    </div>
+                    <textarea id="reqMessage" rows="3" class="w-full bg-stone-50 border rounded-xl p-2.5 text-xs" placeholder="안녕하세요! 커피 한 잔하며 직무와 커리어 이야기 나누고 싶어 신청합니다."></textarea>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200 text-[11px] text-amber-900 flex items-center justify-between">
+                <span>💡 커피챗 수락 시 신청자의 이용권 1회가 차감됩니다.</span>
+                <span class="font-bold text-amber-800">수락자 차감 없음 🎁</span>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="closeModal('coffeeChatModal')" class="w-1/3 bg-stone-100 text-stone-600 font-medium text-xs py-3 rounded-xl cursor-pointer">취소</button>
+                <button onclick="submitCoffeeChatRequest()" class="w-2/3 bg-coffee-700 text-white font-bold text-xs py-3 rounded-xl shadow cursor-pointer">커피챗 신청하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                <h3 class="font-bold text-stone-800">커피챗 후기 작성</h3>
+                <button onclick="closeModal('reviewModal')" class="text-stone-400 hover:text-stone-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="font-semibold block mb-1">완료된 커피챗 선택</label>
+                    <select id="reviewChatSelect" onchange="onSelectReviewChat(this.value)" class="w-full bg-stone-50 border p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none"></select>
+                </div>
+                <div>
+                    <label class="font-semibold block mb-1">상대방 정보</label>
+                    <div id="reviewPeerNameDisplay" class="w-full bg-stone-100 border border-stone-200 p-2.5 rounded-xl font-bold text-stone-800"></div>
+                </div>
+                <div>
+                    <label class="font-semibold block mb-1">만난 장소</label>
+                    <input type="text" id="reviewPlaceInput" value="스타벅스 판교H스퀘어점" class="w-full bg-stone-50 border p-2.5 rounded-xl font-medium">
+                </div>
+                <div>
+                    <label class="font-semibold block mb-1">만족도 별점</label>
+                    <div class="flex gap-2 text-amber-400 text-lg" id="starRatingBox">
+                        <i class="fa-solid fa-star cursor-pointer" onclick="setStarRating(1)"></i>
+                        <i class="fa-solid fa-star cursor-pointer" onclick="setStarRating(2)"></i>
+                        <i class="fa-solid fa-star cursor-pointer" onclick="setStarRating(3)"></i>
+                        <i class="fa-solid fa-star cursor-pointer" onclick="setStarRating(4)"></i>
+                        <i class="fa-solid fa-star cursor-pointer" onclick="setStarRating(5)"></i>
+                    </div>
+                </div>
+                <div>
+                    <label class="font-semibold block mb-1">후기 내용</label>
+                    <textarea id="reviewTextInput" rows="3" class="w-full bg-stone-50 border p-2.5 rounded-xl" placeholder="직무 노하우나 대화 후기를 작성하세요."></textarea>
+                </div>
+            </div>
+
+            <button onclick="submitReview()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-3 rounded-xl shadow transition cursor-pointer">후기 등록하기</button>
+        </div>
+    </div>
+
+    <!-- B2B Business Modal -->
+    <div id="businessInquiryModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                <h3 class="font-bold text-stone-800">B2B 비즈니스 & 제휴 문의</h3>
+                <button onclick="closeModal('businessInquiryModal')" class="text-stone-400 hover:text-stone-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <input type="text" id="b2bCompany" placeholder="문의 기업명" class="w-full bg-stone-50 border p-2.5 rounded-xl">
+                <input type="email" id="b2bEmail" placeholder="담당자 이메일" class="w-full bg-stone-50 border p-2.5 rounded-xl">
+                <textarea id="b2bDetails" rows="3" placeholder="제휴 내용" class="w-full bg-stone-50 border p-2.5 rounded-xl"></textarea>
+            </div>
+            <button onclick="submitBusinessInquiry()" class="w-full bg-stone-900 text-amber-400 font-bold text-xs py-3 rounded-xl cursor-pointer">제출하기</button>
+        </div>
+    </div>
+
+    <!-- Google Play Billing Payment Sheet Modal -->
+    <div id="googlePlayModal" class="fixed inset-0 bg-stone-900/70 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 border border-stone-200">
+            <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.608 1.808C3.238 2.213 3 2.825 3 3.618V20.382C3 21.175 3.238 21.787 3.608 22.192L3.7 22.28L13.12 12.86V12.008L3.7 2.588L3.608 1.808Z" fill="#2196F3"/>
+                        <path d="M16.262 16.002L13.12 12.86V12.008L16.262 8.866L16.353 8.918L20.08 11.037C21.144 11.642 21.144 12.632 20.08 13.237L16.353 15.356L16.262 16.002Z" fill="#FFC107"/>
+                        <path d="M16.353 15.356L13.12 12.122L3.608 22.192C3.96 22.562 4.542 22.618 5.215 22.235L16.353 15.356Z" fill="#F44336"/>
+                        <path d="M16.353 8.918L5.215 2.639C4.542 2.256 3.96 2.312 3.608 2.682L13.12 12.122L16.353 8.918Z" fill="#4CAF50"/>
+                    </svg>
+                    <span class="font-black text-stone-800 text-sm tracking-tight">Google Play 결제</span>
+                </div>
+                <button onclick="closeModal('googlePlayModal')" class="text-stone-400 hover:text-stone-600 text-lg cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center justify-between bg-stone-50 p-2.5 rounded-xl border border-stone-200 text-xs">
+                <div class="flex items-center space-x-2">
+                    <div class="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-[10px]">G</div>
+                    <div>
+                        <p class="font-bold text-stone-800" id="playAccountEmail">officebreak.user@gmail.com</p>
+                        <p class="text-[9px] text-stone-400">Google Play 연결된 계정</p>
+                    </div>
+                </div>
+                <span class="text-[10px] bg-stone-200 text-stone-700 px-2 py-0.5 rounded font-bold">인앱 결제</span>
+            </div>
+
+            <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-200/80 space-y-1">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-[9px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.2 rounded" id="playSkuBadge">SKU: officebreak_pass_1</span>
+                        <h3 class="font-black text-stone-900 text-base mt-1" id="playProductName">OfficeBreak 1회 이용권</h3>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-lg font-black text-stone-900" id="playProductPrice">₩1,800</span>
+                        <p class="text-[9px] text-stone-500">VAT 포함</p>
+                    </div>
+                </div>
+                <p class="text-[11px] text-stone-600 pt-1" id="playProductDesc">도보 10분 내 검증된 직장인 1회 커피챗 신청권</p>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-xs font-bold text-stone-700">결제 수단 선택</label>
+                <select id="playPaymentMethod" class="w-full bg-stone-50 border border-stone-300 rounded-xl p-2.5 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none cursor-pointer">
+                    <option value="google_pay">💳 Google Pay (신한카드 **** 4092)</option>
+                    <option value="play_balance">💰 Google Play 잔액 (₩42,500)</option>
+                    <option value="kakaopay">🟡 카카오페이 (Google Play 연동)</option>
+                    <option value="phone">📱 휴대폰 소액결제 (SKT/KT/LGU+)</option>
+                </select>
+            </div>
+
+            <button id="btnConfirmPlayPurchase" onclick="processPlayPurchase()" class="w-full bg-[#01875f] hover:bg-[#01704f] text-white font-extrabold text-xs py-3.5 rounded-xl transition shadow-md flex items-center justify-center space-x-2 cursor-pointer">
+                <i class="fa-solid fa-lock text-sm"></i>
+                <span>1회 클릭 구매 (Google Play)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Personal Profile Settings Modal -->
+    <div id="profileSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5">
+            <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center">
+                        <i class="fa-solid fa-user-gear"></i>
+                    </div>
+                    <h3 class="font-bold text-stone-800">개인 프로필 설정</h3>
+                </div>
+                <button onclick="closeModal('profileSettingsModal')" class="text-stone-400 hover:text-stone-600 text-lg cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-2 text-center">
+                <label class="block text-xs font-bold text-stone-700 text-left">프로필 사진 등록</label>
+                <div class="flex items-center justify-center space-x-4">
+                    <div class="relative group">
+                        <img id="settingAvatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" class="w-20 h-20 rounded-full object-cover border-4 border-amber-200 shadow-md">
+                        <button onclick="document.getElementById('avatarFileInput').click()" class="absolute bottom-0 right-0 bg-stone-900 text-amber-400 p-2 rounded-full shadow hover:bg-black transition text-xs cursor-pointer">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <input type="file" id="avatarFileInput" accept="image/*" onchange="handleAvatarFileSelect(event)" class="hidden">
+                    <div class="text-left space-y-1">
+                        <button onclick="document.getElementById('avatarFileInput').click()" class="bg-stone-100 hover:bg-stone-200 text-stone-800 px-3 py-1.5 rounded-xl text-xs font-bold transition border border-stone-300 cursor-pointer">
+                            내 사진 업로드
+                        </button>
+                        <p class="text-[10px] text-stone-400">JPG, PNG 파일 지원 (최대 5MB)</p>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <p class="text-[10px] text-stone-500 font-semibold mb-1 text-left">추천 프로필 사진 선택:</p>
+                    <div class="flex justify-start gap-2">
+                        <img onclick="selectPresetAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80')" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" class="w-9 h-9 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-amber-500 transition border">
+                        <img onclick="selectPresetAvatar('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80')" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" class="w-9 h-9 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-amber-500 transition border">
+                        <img onclick="selectPresetAvatar('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80')" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" class="w-9 h-9 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-amber-500 transition border">
+                        <img onclick="selectPresetAvatar('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80')" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80" class="w-9 h-9 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-amber-500 transition border">
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-xs font-bold text-stone-700">활동 닉네임 설정</label>
+                <input type="text" id="settingNicknameInput" placeholder="예: 판교기획자, 서연프로" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+
+            <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 space-y-1.5">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-stone-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-lock text-stone-600"></i> 프로필 비공개 설정
+                    </span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="settingPrivateProfileToggle" class="sr-only peer">
+                        <div class="w-9 h-5 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-stone-800"></div>
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="saveProfileSettings()" class="w-full bg-coffee-700 hover:bg-coffee-800 text-white font-bold text-xs py-3 rounded-xl transition shadow-md cursor-pointer">
+                프로필 설정 저장
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-stone-900 text-white px-5 py-3 rounded-2xl shadow-xl z-50 text-xs font-medium flex items-center space-x-3 transition transform translate-y-20 opacity-0 duration-300">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toastText">처리되었습니다.</span>
+    </div>
+
+    <script>
+        // Global Application State
+        let currentSubReqTab = 'received';
+        let currentChatFilterMode = 'active';
+        let currentHubKey = 'pangyo';
+        let leafletMap = null;
+        let mapMarkers = [];
+        let activeChatId = null;
+        let activeSelectedPeer = null;
+        let selectedTimeSlotText = "점심시간 12:15";
+        let generatedCode = null;
+        let timeLeft = 180;
+        let timerInterval = null;
+        let isEmailCodeVerified = false;
+        let currentSelectedStar = 5;
+        let tempAvatarDataUrl = null;
+        let isSidebarOpen = false;
+        let androidDeferredPrompt = null;
+
+        // Dynamic Manifest Construction for Android PWA / APK Conversion
+        const manifestData = {
+            "name": "OfficeBreak - 1km 회사원 커피챗",
+            "short_name": "OfficeBreak",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#f5f2eb",
+            "theme_color": "#2c1804",
+            "description": "도보 10분 내 검증된 직장인 P2P 커피챗 커넥트",
+            "icons": [
+                {
+                    "src": "https://cdn-icons-png.flaticon.com/512/2935/2935413.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ]
+        };
+        const stringManifest = JSON.stringify(manifestData);
+        const blobManifest = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blobManifest);
+        document.getElementById('manifestPlaceholder').setAttribute('href', manifestURL);
+
+        // Android Deferred Install Listener
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            androidDeferredPrompt = e;
+            const banner = document.getElementById('androidInstallBanner');
+            if (banner) banner.classList.remove('hidden');
+        });
+
+        function triggerAndroidAppInstall() {
+            if (androidDeferredPrompt) {
+                androidDeferredPrompt.prompt();
+                androidDeferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        showToast("🎉 OfficeBreak 앱 설치가 완료되었습니다!");
+                    }
+                    dismissAndroidBanner();
+                });
+            } else {
+                showToast("💡 Android Chrome 메뉴 > [홈 화면에 추가]를 눌러 앱으로 설치할 수 있습니다.");
+            }
+        }
+
+        function dismissAndroidBanner() {
+            const banner = document.getElementById('androidInstallBanner');
+            if (banner) banner.classList.add('hidden');
+        }
+
+        // Android Hardware Back Button Handling
+        window.addEventListener('popstate', (e) => {
+            const modals = ['verificationModal', 'coffeeChatModal', 'reviewModal', 'businessInquiryModal', 'googlePlayModal', 'profileSettingsModal'];
+            let closedAny = false;
+            modals.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && !el.classList.contains('hidden')) {
+                    closeModal(id);
+                    closedAny = true;
+                }
+            });
+            if (isSidebarOpen) {
+                toggleSidebarMenu();
+                closedAny = true;
+            }
+        });
+
+        // Register Inline Service Worker for Android PWA Support
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', e => self.skipWaiting());
+                self.addEventListener('activate', e => self.clients.claim());
+                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+            `;
+            const blobSW = new Blob([swCode], { type: 'text/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blobSW)).catch(err => console.log(err));
+        }
+
+        // Business Hub Configs
+        const hubConfigs = {
+            pangyo: {
+                name: "판교 테크노밸리",
+                center: [37.4020, 127.1086],
+                cafes: ["스타벅스 판교H스퀘어점", "투썸플레이스 판교 삼환하이펙스점", "폴바셋 판교인포텍점", "커피빈 판교유스페이스점"]
+            },
+            gangnam: {
+                name: "강남역 / 테헤란로",
+                center: [37.4979, 127.0276],
+                cafes: ["스타벅스 강남R점", "투썸플레이스 테헤란로점", "블루보틀 강남 카페"]
+            },
+            yeouido: {
+                name: "여의도 금융타운",
+                center: [37.5215, 126.9242],
+                cafes: ["스타벅스 IFC몰점", "폴바셋 여의도점", "커피빈 여의도TP타워점"]
+            },
+            seongsu: {
+                name: "성수 IT 클러스터",
+                center: [37.5445, 127.0558],
+                cafes: ["센터커피 성수점", "어니언 성수", "블루보틀 성수 카페"]
+            }
+        };
+
+        // Logged-in User Information
+        let currentUser = {
+            name: "김서연 프로",
+            nickname: "김서연 프로",
+            company: "카카오",
+            office: "판교 H 스퀘어 N동",
+            domain: "kakao.com",
+            role: "서비스 기획자 / PO",
+            passes: 3,
+            isPro: false,
+            popularity: 14,
+            chatStatusOn: true,
+            isPrivate: false,
+            verified: true,
+            welcomePassClaimed: true,
+            lat: 37.4020,
+            lng: 127.1086,
+            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+        };
+
+        // Nearby Peers Mock Data
+        let peerData = [
+            {
+                id: 1,
+                name: "박준혁 프로",
+                company: "네이버",
+                role: "프론트엔드 개발자",
+                office: "판교 크래프톤 타워",
+                hub: "pangyo",
+                distance: 320,
+                lat: 37.4012,
+                lng: 127.1105,
+                status: "ON",
+                topics: ["직무/커리어", "이직/업계동향"],
+                about: "React / Next.js 기반 서비스 개발 5년 차입니다. 최근 FE 성능 최적화와 백엔드 협업 경험 나누고 싶어요!",
+                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+                popularity: 28
+            },
+            {
+                id: 2,
+                name: "이민지 리드",
+                company: "토스",
+                role: "브랜드 마케터",
+                office: "판교 테크원 타워",
+                hub: "pangyo",
+                distance: 480,
+                lat: 37.3995,
+                lng: 127.1070,
+                status: "ON",
+                topics: ["가벼운 점심", "창업/사이드"],
+                about: "금융 IT 마케팅 및 캠페인 리드 중입니다. 점심 시간에 가볍게 맛집 찾아가며 커리어 커뮤니케이션 해요!",
+                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+                popularity: 19
+            },
+            {
+                id: 3,
+                name: "최성우 팀장",
+                company: "라인",
+                role: "백엔드 개발팀장",
+                office: "판교 메디피움 건물",
+                hub: "pangyo",
+                distance: 850,
+                lat: 37.4045,
+                lng: 127.1120,
+                status: "ON",
+                topics: ["이직/업계동향", "직무/커리어"],
+                about: "대규모 트래픽 분산 처리 및 MSA 구축 경험이 있습니다. 주니어~중니어 분들 커리어 고민 상담 환영합니다.",
+                avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+                popularity: 35
+            },
+            {
+                id: 4,
+                name: "정유진 수석",
+                company: "엔씨소프트",
+                role: "UI/UX 디자이너",
+                office: "판교 엔씨 R&D 센터",
+                hub: "pangyo",
+                distance: 920,
+                lat: 37.4001,
+                lng: 127.1030,
+                status: "OFF",
+                topics: ["직무/커리어"],
+                about: "게임 및 글로벌 앱 UX 설계하고 있습니다. 프로 요금제 회원의 커리큘럼 문의는 인앱으로 환영합니다.",
+                avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+                popularity: 11
+            }
+        ];
+
+        let incomingRequests = [
+            {
+                id: 101,
+                senderName: "박준혁 프로",
+                company: "네이버",
+                role: "프론트엔드 개발자",
+                cafe: "스타벅스 판교H스퀘어점",
+                time: "오늘 12:15",
+                topic: "직무/커리어",
+                message: "안녕하세요 서연님! 카카오 PO 직무와 서비스 기획 노하우 공유받고 싶습니다.",
+                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+                receivedDate: new Date()
+            }
+        ];
+
+        let sentRequests = [];
+
+        let chatList = [
+            {
+                id: 201,
+                peerName: "이민지 리드",
+                peerCompany: "토스",
+                peerRole: "브랜드 마케터",
+                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+                cafe: "스타벅스 판교H스퀘어점",
+                time: "오늘 12:15",
+                isCompleted: false,
+                messages: [
+                    { id: 1, sender: "peer", text: "안녕하세요 서연 프로님! 오늘 12:15 스타벅스 H스퀘어점 맞으시죠?", time: "오전 11:30" },
+                    { id: 2, sender: "me", text: "네 민지님! 1층 창가 좌석 근처에서 뵙겠습니다. 기대되네요!", time: "오전 11:32" }
+                ]
+            }
+        ];
+
+        let completedChatList = [];
+
+        let reviewsData = [
+            {
+                id: 1,
+                isWeeklyBest: true,
+                author: "윤상현 매니저",
+                company: "카카오뱅크",
+                peerName: "박준혁 프로",
+                peerCompany: "네이버",
+                peerRole: "개발자",
+                place: "스타벅스 판교H스퀘어점",
+                rating: 5,
+                comment: "도보 5분 거리라 점심시간에 부담 없이 만나 커피 한 잔했습니다. 대용량 데이터 처리 노하우를 명쾌하게 설명해주셔서 큰 도움이 되었습니다!",
+                date: "2일 전"
+            }
+        ];
+
+        function toggleSidebarMenu() {
+            const sidebar = document.getElementById('slidingSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (!sidebar || !backdrop) return;
+            
+            isSidebarOpen = !isSidebarOpen;
+            if (isSidebarOpen) {
+                sidebar.classList.remove('closed');
+                sidebar.classList.add('open');
+                backdrop.classList.remove('hidden');
+                history.pushState({ menu: true }, '');
+            } else {
+                sidebar.classList.remove('open');
+                sidebar.classList.add('closed');
+                backdrop.classList.add('hidden');
+            }
+            
+            if (leafletMap) {
+                setTimeout(() => leafletMap.invalidateSize(), 300);
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'bg-stone-100', 'font-bold'));
+
+            const targetPanel = document.getElementById(`tab-content-${tabName}`);
+            if (targetPanel) targetPanel.classList.remove('hidden');
+
+            const navBtn = document.getElementById(`nav-${tabName}`);
+            if (navBtn) navBtn.classList.add('active', 'bg-stone-100', 'font-bold');
+
+            if (isSidebarOpen) {
+                toggleSidebarMenu();
+            }
+
+            if (tabName === 'ranking') {
+                renderPopularityRanking();
+            } else if (tabName === 'radar' && leafletMap) {
+                setTimeout(() => leafletMap.invalidateSize(), 100);
+            }
+        }
+
+        function toggleViewMode(mode) {
+            const mapContainer = document.getElementById('mapViewContainer');
+            const gridContainer = document.getElementById('peerCardsGrid');
+
+            if (mode === 'map') {
+                mapContainer.classList.remove('hidden');
+                gridContainer.classList.remove('hidden');
+            } else {
+                mapContainer.classList.add('hidden');
+                gridContainer.classList.remove('hidden');
+            }
+        }
+
+        function changeBusinessHub(hubKey) {
+            if (hubKey !== 'pangyo' && !currentUser.isPro) {
+                showToast("👑 타지역 거점 위치 변경은 PRO 멤버십 전용 기능입니다. (기본: 본인 오피스 지역)");
+                document.getElementById('hubSelector').value = currentHubKey;
+                switchTab('pricing');
+                return;
+            }
+
+            currentHubKey = hubKey;
+            const hub = hubConfigs[hubKey];
+            document.getElementById('radarSubtitle').innerHTML = `현재 <span class="font-bold text-amber-300">${hub.name}</span> 기준 1km 내 검증된 직장인 탐색 중`;
+            initMap();
+        }
+
+        function initMap() {
+            const hub = hubConfigs[currentHubKey];
+            if (!leafletMap) {
+                leafletMap = L.map('leafletMap').setView(hub.center, 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(leafletMap);
+            } else {
+                leafletMap.setView(hub.center, 15);
+            }
+
+            mapMarkers.forEach(marker => leafletMap.removeLayer(marker));
+            mapMarkers = [];
+
+            const myIcon = L.divIcon({
+                className: 'custom-map-icon',
+                html: `<div class="w-8 h-8 rounded-full bg-coffee-800 text-white border-2 border-white shadow-lg flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-user"></i></div>`,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+            const myMarker = L.marker([currentUser.lat, currentUser.lng], { icon: myIcon }).addTo(leafletMap);
+            myMarker.bindPopup(`<b>${currentUser.name} (${currentUser.company})</b><br>${currentUser.office}`);
+            mapMarkers.push(myMarker);
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const maxDist = parseInt(document.getElementById('distanceFilter').value);
+            const selectedTopic = document.getElementById('topicFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            mapMarkers.slice(1).forEach(m => leafletMap.removeLayer(m));
+            mapMarkers = [mapMarkers[0]];
+
+            const filteredPeers = peerData.filter(peer => {
+                if (peer.hub !== currentHubKey) return false;
+                if (peer.distance > maxDist) return false;
+                if (selectedTopic !== 'all' && !peer.topics.includes(selectedTopic)) return false;
+                if (statusFilter === 'ON' && peer.status !== 'ON') return false;
+                return true;
+            });
+
+            document.getElementById('nearbyPeerCount').innerText = `${filteredPeers.length}명`;
+
+            filteredPeers.forEach(peer => {
+                const isOnline = peer.status === 'ON';
+                const bgClass = isOnline ? 'bg-emerald-500' : 'bg-stone-400';
+                const peerIcon = L.divIcon({
+                    className: 'custom-peer-icon',
+                    html: `<div class="w-8 h-8 rounded-full ${bgClass} text-white border-2 border-white shadow-md flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-mug-hot"></i></div>`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+                const marker = L.marker([peer.lat, peer.lng], { icon: peerIcon }).addTo(leafletMap);
+                marker.bindPopup(`
+                    <div class="p-1 space-y-1">
+                        <p class="font-bold text-xs">${peer.name} (${peer.company})</p>
+                        <p class="text-[11px] text-gray-600">${peer.role}</p>
+                        <p class="text-[10px] text-amber-700">도보 ${Math.round(peer.distance / 80)}분 (${peer.distance}m)</p>
+                        <button onclick="openCoffeeChatModal(${peer.id})" class="w-full bg-coffee-700 text-white text-[10px] py-1 rounded mt-1 font-bold cursor-pointer">커피챗 신청</button>
+                    </div>
+                `);
+                mapMarkers.push(marker);
+            });
+
+            const grid = document.getElementById('peerCardsGrid');
+            if (filteredPeers.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-stone-400 text-xs">조건에 해당하는 근처 직장인 동료가 없습니다.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filteredPeers.map(peer => `
+                <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs flex flex-col justify-between space-y-3 hover:shadow-md transition">
+                    <div class="space-y-2.5">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center space-x-3">
+                                <img src="${peer.avatar}" class="w-11 h-11 rounded-full object-cover border border-stone-200">
+                                <div>
+                                    <div class="flex items-center space-x-1.5">
+                                        <h4 class="font-bold text-stone-800 text-sm">${peer.name}</h4>
+                                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.2 rounded font-bold">인증됨</span>
+                                    </div>
+                                    <p class="text-xs text-stone-500 font-medium">${peer.company} • ${peer.role}</p>
+                                </div>
+                            </div>
+                            <span class="${peer.status === 'ON' ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-500'} text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                ${peer.status === 'ON' ? '🟢 ON' : '🔴 OFF'}
+                            </span>
+                        </div>
+                        <p class="text-xs text-stone-600 line-clamp-2 bg-stone-50 p-2.5 rounded-xl border border-stone-100">${peer.about}</p>
+                        <div class="flex flex-wrap gap-1">
+                            ${peer.topics.map(t => `<span class="bg-amber-50 text-amber-900 border border-amber-200/60 text-[10px] px-2 py-0.5 rounded-md font-semibold">${t}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-stone-100 text-xs">
+                        <span class="text-coffee-700 font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-person-walking text-amber-600"></i> 도보 ${Math.round(peer.distance / 80)}분 (${peer.distance}m)
+                        </span>
+                        <button onclick="openCoffeeChatModal(${peer.id})" class="bg-coffee-700 hover:bg-coffee-800 text-white px-3.5 py-1.5 rounded-xl font-bold transition shadow-xs text-xs cursor-pointer">
+                            커피챗 신청
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            history.pushState({ modal: id }, '');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function openVerificationModal() { openModal('verificationModal'); }
+        function openProfileSettingsModal() { openModal('profileSettingsModal'); }
+        function openBusinessInquiryModal() { openModal('businessInquiryModal'); }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastText').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Google Play Billing Handler
+        async function processPlayPurchase() {
+            const btn = document.getElementById('btnConfirmPlayPurchase');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-sm mr-2"></i> Google Play 승인 중...`;
+
+            setTimeout(() => {
+                const orderId = `GPA.3382-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`;
+                currentUser.passes += 1;
+                document.getElementById('headerPassCount').innerHTML = `이용권 <b class="text-amber-700">${currentUser.passes}회</b>`;
+                showToast(`🛍️ [Google Play] 결제 성공! (${orderId}) 이용권이 충전되었습니다.`);
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-lock text-sm mr-2"></i> 1회 클릭 구매 (Google Play)`;
+                closeModal('googlePlayModal');
+            }, 1000);
+        }
+
+        window.onload = function() {
+            initMap();
+            switchTab('radar');
+        };
+    </script>
+</body>
+</html>
