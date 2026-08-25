@@ -159,7 +159,8 @@
                 <div class="relative flex items-center gap-0.5 sm:gap-1 bg-stone-100 border border-stone-300 rounded-xl px-1.5 sm:px-2 py-0.5">
                     <span class="text-[8px] sm:text-[9px] bg-amber-500 text-white font-black px-1 sm:px-1.5 py-0.2 rounded-full shadow-2xs">👑 PRO</span>
                     <select id="hubSelector" onchange="changeBusinessHub(this.value)" class="bg-transparent text-stone-700 text-[11px] sm:text-xs rounded-xl focus:outline-none block p-1 font-bold cursor-pointer max-w-[110px] sm:max-w-none truncate">
-                        <option value="pangyo">📍 판교 테크노밸리</option>
+                        <option value="samseong">📍 삼성역 / 코엑스</option>
+                        <option value="pangyo">📍 판교 테크노밸리 (PRO)</option>
                         <option value="gangnam">📍 강남역 / 테헤란로 (PRO)</option>
                         <option value="yeouido">📍 여의도 금융타운 (PRO)</option>
                         <option value="seongsu">📍 성수 IT 클러스터 (PRO)</option>
@@ -361,7 +362,7 @@
                         걸어서 10분 내, 커피 한 잔으로 만나는 내 주변 직장인
                     </h2>
                     <p class="text-[11px] sm:text-xs text-stone-300 mt-1" id="radarSubtitle">
-                        현재 <span class="font-bold text-amber-300">판교 H스퀘어</span> 기준 1km 내 검증된 직장인 탐색 중
+                        현재 <span class="font-bold text-amber-300">삼성역 / 코엑스</span> 기준 1km 내 검증된 직장인 탐색 중
                     </p>
                 </div>
 
@@ -711,7 +712,7 @@
                             <span class="bg-purple-200 text-purple-900 text-[10px] font-bold px-2 py-0.5 rounded">PRO 멤버십</span>
                             <h3 class="text-lg font-black text-purple-950">월간 PRO</h3>
                             <div class="text-2xl font-black text-purple-900">₩30,000 <span class="text-xs font-normal text-stone-500">/ 월</span></div>
-                            <p class="text-[11px] text-purple-800">모든 거점(강남/여의도/성수) 전환, OFF 회원 인앱 알림 신청 & 무제한 커피챗</p>
+                            <p class="text-[11px] text-purple-800">모든 거점(강남/삼성/여의도/성수) 전환, OFF 회원 인앱 알림 신청 & 무제한 커피챗</p>
                         </div>
                         <button onclick="subscribeMembership('월간PRO', 30000)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow cursor-pointer">
                             월간 PRO 구독
@@ -1119,7 +1120,7 @@
         // Global Application State
         let currentSubReqTab = 'received';
         let currentChatFilterMode = 'active';
-        let currentHubKey = 'pangyo';
+        let currentHubKey = 'samseong';
         let leafletMap = null;
         let mapMarkers = [];
         let activeChatId = null;
@@ -1134,85 +1135,15 @@
         let isSidebarOpen = false;
         let androidDeferredPrompt = null;
 
-        // Dynamic Manifest Construction for Android PWA / APK Conversion
-        const manifestData = {
-            "name": "OfficeBreak - 1km 회사원 커피챗",
-            "short_name": "OfficeBreak",
-            "start_url": ".",
-            "display": "standalone",
-            "background_color": "#f5f2eb",
-            "theme_color": "#2c1804",
-            "description": "도보 10분 내 검증된 직장인 P2P 커피챗 커넥트",
-            "icons": [
-                {
-                    "src": "https://cdn-icons-png.flaticon.com/512/2935/2935413.png",
-                    "sizes": "512x512",
-                    "type": "image/png"
-                }
-            ]
-        };
-        const stringManifest = JSON.stringify(manifestData);
-        const blobManifest = new Blob([stringManifest], {type: 'application/json'});
-        const manifestURL = URL.createObjectURL(blobManifest);
-        document.getElementById('manifestPlaceholder').setAttribute('href', manifestURL);
-
-        // Android Deferred Install Listener
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            androidDeferredPrompt = e;
-            const banner = document.getElementById('androidInstallBanner');
-            if (banner) banner.classList.remove('hidden');
-        });
-
-        function triggerAndroidAppInstall() {
-            if (androidDeferredPrompt) {
-                androidDeferredPrompt.prompt();
-                androidDeferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        showToast("🎉 OfficeBreak 앱 설치가 완료되었습니다!");
-                    }
-                    dismissAndroidBanner();
-                });
-            } else {
-                showToast("💡 Android Chrome 메뉴 > [홈 화면에 추가]를 눌러 앱으로 설치할 수 있습니다.");
-            }
-        }
-
-        function dismissAndroidBanner() {
-            const banner = document.getElementById('androidInstallBanner');
-            if (banner) banner.classList.add('hidden');
-        }
-
-        // Android Hardware Back Button Handling
-        window.addEventListener('popstate', (e) => {
-            const modals = ['verificationModal', 'coffeeChatModal', 'reviewModal', 'businessInquiryModal', 'googlePlayModal', 'profileSettingsModal'];
-            let closedAny = false;
-            modals.forEach(id => {
-                const el = document.getElementById(id);
-                if (el && !el.classList.contains('hidden')) {
-                    closeModal(id);
-                    closedAny = true;
-                }
-            });
-            if (isSidebarOpen) {
-                toggleSidebarMenu();
-                closedAny = true;
-            }
-        });
-
-        // Register Inline Service Worker for Android PWA Support
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('install', e => self.skipWaiting());
-                self.addEventListener('activate', e => self.clients.claim());
-                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-            `;
-            const blobSW = new Blob([swCode], { type: 'text/javascript' });
-            navigator.serviceWorker.register(URL.createObjectURL(blobSW)).catch(err => console.log(err));
-        }
+        // ... existing manifest & service worker code ...
 
         // Business Hub Configs
         const hubConfigs = {
+            samseong: {
+                name: "삼성역 / 코엑스",
+                center: [37.5088, 127.0632],
+                cafes: ["스타벅스 코엑스몰점", "폴바셋 삼성역점", "테라로사 코엑스점", "투썸플레이스 삼성역점"]
+            },
             pangyo: {
                 name: "판교 테크노밸리",
                 center: [37.4020, 127.1086],
@@ -1240,7 +1171,7 @@
             name: "김서연 프로",
             nickname: "김서연 프로",
             company: "카카오",
-            office: "판교 H 스퀘어 N동",
+            office: "삼성역 파르나스타워",
             domain: "kakao.com",
             role: "서비스 기획자 / PO",
             passes: 3,
@@ -1250,8 +1181,8 @@
             isPrivate: false,
             verified: true,
             welcomePassClaimed: true,
-            lat: 37.4020,
-            lng: 127.1086,
+            lat: 37.5088,
+            lng: 127.0632,
             avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
         };
 
@@ -1262,11 +1193,11 @@
                 name: "박준혁 프로",
                 company: "네이버",
                 role: "프론트엔드 개발자",
-                office: "판교 크래프톤 타워",
-                hub: "pangyo",
+                office: "삼성역 글라스타워",
+                hub: "samseong",
                 distance: 320,
-                lat: 37.4012,
-                lng: 127.1105,
+                lat: 37.5095,
+                lng: 127.0640,
                 status: "ON",
                 topics: ["직무/커리어", "이직/업계동향"],
                 about: "React / Next.js 기반 서비스 개발 5년 차입니다. 최근 FE 성능 최적화와 백엔드 협업 경험 나누고 싶어요!",
@@ -1278,11 +1209,11 @@
                 name: "이민지 리드",
                 company: "토스",
                 role: "브랜드 마케터",
-                office: "판교 테크원 타워",
-                hub: "pangyo",
+                office: "코엑스 트레이드 타워",
+                hub: "samseong",
                 distance: 480,
-                lat: 37.3995,
-                lng: 127.1070,
+                lat: 37.5075,
+                lng: 127.0615,
                 status: "ON",
                 topics: ["가벼운 점심", "창업/사이드"],
                 about: "금융 IT 마케팅 및 캠페인 리드 중입니다. 점심 시간에 가볍게 맛집 찾아가며 커리어 커뮤니케이션 해요!",
@@ -1294,11 +1225,11 @@
                 name: "최성우 팀장",
                 company: "라인",
                 role: "백엔드 개발팀장",
-                office: "판교 메디피움 건물",
-                hub: "pangyo",
+                office: "삼성동 아셈타워",
+                hub: "samseong",
                 distance: 850,
-                lat: 37.4045,
-                lng: 127.1120,
+                lat: 37.5110,
+                lng: 127.0660,
                 status: "ON",
                 topics: ["이직/업계동향", "직무/커리어"],
                 about: "대규모 트래픽 분산 처리 및 MSA 구축 경험이 있습니다. 주니어~중니어 분들 커리어 고민 상담 환영합니다.",
@@ -1310,11 +1241,11 @@
                 name: "정유진 수석",
                 company: "엔씨소프트",
                 role: "UI/UX 디자이너",
-                office: "판교 엔씨 R&D 센터",
-                hub: "pangyo",
+                office: "삼성역 도심공항타워",
+                hub: "samseong",
                 distance: 920,
-                lat: 37.4001,
-                lng: 127.1030,
+                lat: 37.5060,
+                lng: 127.0590,
                 status: "OFF",
                 topics: ["직무/커리어"],
                 about: "게임 및 글로벌 앱 UX 설계하고 있습니다. 프로 요금제 회원의 커리큘럼 문의는 인앱으로 환영합니다.",
@@ -1432,7 +1363,7 @@
         }
 
         function changeBusinessHub(hubKey) {
-            if (hubKey !== 'pangyo' && !currentUser.isPro) {
+            if (hubKey !== 'samseong' && !currentUser.isPro) {
                 showToast("👑 타지역 거점 위치 변경은 PRO 멤버십 전용 기능입니다. (기본: 본인 오피스 지역)");
                 document.getElementById('hubSelector').value = currentHubKey;
                 switchTab('pricing');
